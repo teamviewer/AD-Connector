@@ -1,7 +1,7 @@
 {
     "AccountTypeDefaultPassword": "Konten mit vorgegebenem Passwort erstellen:",
     "AccountTypeGeneratedPassword": "Konten mit generiertem Passwort erstellen",
-    "AccountTypeSso": "Single Sign-On verwenden",
+    "AccountTypeSso": "Single Sign-On verwenden (benötigt Tensor Lizenz)",
     "Add": "Hinzufügen",
     "Apply": "Übernehmen",
     "Cancel": "Abbrechen",

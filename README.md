@@ -148,6 +148,7 @@ into account for the mapping between AD users and TeamViewer users.
 ## Changelog
 
 ### [1.2.2]
+- Added hint to options that require TeamViewer Tensor license.
 - Fixed escaping of spaces in script path of scheduled task.
 
 ### [1.2.1]
