@@ -147,6 +147,9 @@ into account for the mapping between AD users and TeamViewer users.
 
 ## Changelog
 
+### [1.2.2]
+- Fixed escaping of spaces in script path of scheduled task.
+
 ### [1.2.1]
 - Fixed handling of trailing whitespace in secondary email addresses.
 - Fixed possible timeouts in update/deactivate user calls to the

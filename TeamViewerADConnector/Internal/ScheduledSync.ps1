@@ -32,7 +32,7 @@ function Get-ScheduledSyncLogDirectory($task) {
 
 function Install-ScheduledSync([TimeSpan] $interval, [string] $logdirectory) {
     if (!(Get-ScheduledSync)) {
-        $command = $scheduledTaskCommand
+        $command = $scheduledTaskCommand -Replace ' ','` '
         if ($logdirectory) {
             $command = "$($command) -LogfileDirectory '$logdirectory'"
         }
