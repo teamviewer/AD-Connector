@@ -147,9 +147,10 @@ into account for the mapping between AD users and TeamViewer users.
 
 ## Changelog
 
-### [1.2.2]
+### [Upcoming Release]
 - Added hint to options that require TeamViewer Tensor license.
 - Fixed escaping of spaces in script path of scheduled task.
+- Fixed handling of global catalog names, starting with `GC://`.
 
 ### [1.2.1]
 - Fixed handling of trailing whitespace in secondary email addresses.
