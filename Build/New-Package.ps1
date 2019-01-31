@@ -18,17 +18,24 @@ Push-Location -Path $Path
 $temporaryDirectory = (Join-Path ([System.IO.Path]::GetTempPath()) ([string][System.Guid]::NewGuid()))
 (New-Item -ItemType Directory -Path $temporaryDirectory) | Out-Null
 
+. .\Build\Select-StringExcludeBlock.ps1
+
+# Markdown Readme File
+$markdownReadmeFile = (Join-Path $temporaryDirectory README.md)
+Get-Content ./README.md | `
+    Select-StringExcludeBlock -Begin '[+github]' -End '[-github]' | `
+    Set-Content $markdownReadmeFile
+
 # HTML Readme File
 ConvertTo-Html `
-    -Title (Get-Content ./README.md -First 1).Trim('# ') `
+    -Title (Get-Content $markdownReadmeFile -First 1).Trim('# ') `
     -PreContent (Get-Content ./Build/README.style.html | Out-String) `
-    -Body (Get-Content ./README.md | Out-String | ConvertFrom-Markdown) | `
+    -Body (Get-Content $markdownReadmeFile | Out-String | ConvertFrom-Markdown) | `
     Set-Content (Join-Path $temporaryDirectory README.html)
 
 # Prepare package files
 Copy-Item ./TeamViewerADConnector -Destination $temporaryDirectory -Recurse
 Copy-Item ./LICENSE.txt -Destination $temporaryDirectory
-Copy-Item ./README.md -Destination $temporaryDirectory
 Copy-Item ./*.bat -Destination $temporaryDirectory
 
 # Set script version
