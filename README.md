@@ -1,17 +1,16 @@
 # TeamViewer Active Directory Connector (AD-Connector)
 
-A simple PowerShell integration script to synchronize users of an Active
-Directory (AD) group to a TeamViewer company via REST based API.
+A PowerShell integration script to synchronize users of an Active Directory (AD) group to a TeamViewer company via REST based API.
 
 <!--[+github]-->
 [![Build Status](https://travis-ci.org/TeamViewer/AD-Connector.svg?branch=master)](https://travis-ci.org/TeamViewer/AD-Connector)
 <!--[-github]-->
 
-Further information can be found here:
-[TeamViewer Knowledge Base Article "Active Directory Connector"](https://community.teamviewer.com/t5/Knowledge-Base/Active-Directory-Connector-AD-Connector/ta-p/31158)
+Further information can be found in the knowledge base article "[Active Directory Connector](https://community.teamviewer.com/t5/Knowledge-Base/Active-Directory-Connector-AD-Connector/ta-p/31158)".
 
-You can download the AD Connector package from our website:
-https://www.teamviewer.com/en/integrations/active-directory/
+## Download
+
+You can download the AD-Connector package from our [website](https://www.teamviewer.com/en/integrations/active-directory/).
 
 ## Configuration
 
