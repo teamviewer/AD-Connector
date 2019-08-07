@@ -1,4 +1,4 @@
-# Copyright (c) 2018 TeamViewer GmbH
+# Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
 function Get-ActiveDirectoryGroup($root) {
@@ -38,4 +38,16 @@ function Get-ActiveDirectoryGroupMember($root, $recursive, $path) {
                 ForEach-Object { [string]($_.Groups[1].Value).Trim() }
         }} | `
         Where-Object { $_.Email -And $_.Name -And $_.IsEnabled }
+}
+
+function Select-ActiveDirectoryCommonName {
+    param([Parameter(ValueFromPipeline)] $path)
+    # Simplified version of a common-name parser.
+    # The following characters need to be escaped:
+    #  , + " \ < > ; \r \n = /
+    # See https://msdn.microsoft.com/en-us/windows/desktop/aa366101
+    # See https://www.ietf.org/rfc/rfc2253.txt
+    if ($path -match 'CN=((?:[^,+"\\<>;\r\n=/]|(?:\\[,+"\\<>;\r\n=/]))+)') {
+        return $Matches.1 -replace '\\([,+"\\<>;\r\n=/])','$1'
+    }
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2018 TeamViewer GmbH
+# Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
 [void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework')
@@ -215,7 +215,10 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     # Click Handler Button "Save & Run"
     $mainWindow.FindName("BtnSaveAndRun").Add_Click( {
             Save-Configuration $mainWindow.DataContext.ConfigurationData
-            Invoke-GraphicalUserInterfaceSync $mainWindow.DataContext.ConfigurationData $culture $mainWindow
+            Invoke-GraphicalUserInterfaceSync `
+                -configuration $mainWindow.DataContext.ConfigurationData `
+                -culture $culture `
+                -owner $mainWindow
         })
 
     # Click Handler Button "Add" (Group)

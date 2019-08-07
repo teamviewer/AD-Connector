@@ -10,6 +10,8 @@
     New users will be created, existing users will be updated and, depending on the
     configuration, TeamViewer users that do not belong to the AD group will be
     deactivated.
+    Optionally, it also synchronises the AD users to corresponding directory-
+    groups that can be used for TeamViewer Conditional Access.
     The script outputs its progress to the console.
 
  .PARAMETER ConfigurationFile
@@ -47,7 +49,7 @@
     Output the version of the script and exit.
 
  .NOTES
-    Copyright (c) 2018 TeamViewer GmbH
+    Copyright (c) 2018-2020 TeamViewer GmbH
     See file LICENSE
     Version {ScriptVersion}
 #>

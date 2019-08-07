@@ -1,21 +1,22 @@
-# Copyright (c) 2018 TeamViewer GmbH
+# Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
 function Import-Configuration($filename) {
     $defaultConfiguration = @{
-        ApiToken              = ''
-        ActiveDirectoryRoot   = ''
-        ActiveDirectoryGroups = @()
-        UserLanguage          = 'en'
-        UseDefaultPassword    = $true
-        DefaultPassword       = ''
-        UseSsoCustomerId      = $false
-        UseGeneratedPassword  = $false
-        SsoCustomerId         = ''
-        TestRun               = $true
-        DeactivateUsers       = $true
-        RecursiveGroups       = $true
-        UseSecondaryEmails    = $true
+        ApiToken                    = ''
+        ActiveDirectoryRoot         = ''
+        ActiveDirectoryGroups       = @()
+        UserLanguage                = 'en'
+        UseDefaultPassword          = $true
+        DefaultPassword             = ''
+        UseSsoCustomerId            = $false
+        UseGeneratedPassword        = $false
+        SsoCustomerId               = ''
+        TestRun                     = $true
+        DeactivateUsers             = $true
+        RecursiveGroups             = $true
+        UseSecondaryEmails          = $true
+        EnableConditionalAccessSync = $false
     }
     if (Test-Path $filename) {
         $configuration = (Get-Content $filename | Out-String | ConvertFrom-Json)
