@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-Copyright (c) 2018 TeamViewer GmbH
+Copyright (c) 2018-2020 TeamViewer GmbH
 See file LICENSE
 -->
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
@@ -137,6 +137,16 @@ See file LICENSE
                                         </RadioButton>
                                     </StackPanel>
                                 </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="{Binding L.TabHeaderConditionalAccess}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition SharedSizeGroup="ConfigurationTabHeight" />
+                            </Grid.RowDefinitions>
+                            <StackPanel Margin="10">
+                                <CheckBox VerticalAlignment="Top" Margin="5" Content="{Binding L.EnableConditionalAccessSync}" IsChecked="{Binding ConfigurationData.EnableConditionalAccessSync}" />
                             </StackPanel>
                         </Grid>
                     </TabItem>

@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2018 TeamViewer GmbH
+﻿# Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
 . "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\ActiveDirectory.ps1"
@@ -69,9 +69,9 @@ Describe 'Get-ActiveDirectoryGroupMember' {
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
         } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (Add-TestUser 'user3@example.test' 'User 3' 1)
-                (Add-TestUser 'user1@example.test' 'User 1' 1)
-                (Add-TestUser 'user2@example.test' 'User 2' 1)
+                (Add-TestUser -mail 'user3@example.test' -name 'User 3' -uac 1)
+                (Add-TestUser -mail 'user1@example.test' -name 'User 1' -uac 1)
+                (Add-TestUser -mail 'user2@example.test' -name 'User 2' -uac 1)
             )
         }
         Mock New-Object { return $mockedDirectorySearcher } `
@@ -90,8 +90,8 @@ Describe 'Get-ActiveDirectoryGroupMember' {
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
         } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (Add-TestUser 'active@example.test' 'Active User' 1)
-                (Add-TestUser 'inactive@example.test' 'Inactive User' 2)
+                (Add-TestUser -mail 'active@example.test' -name 'Active User' -uac 1)
+                (Add-TestUser -mail 'inactive@example.test' -name 'Inactive User' -uac 2)
             )
         }
         Mock New-Object { return $mockedDirectorySearcher } `
@@ -106,7 +106,8 @@ Describe 'Get-ActiveDirectoryGroupMember' {
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
         } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (Add-TestUser 'primary@example.test' 'Test User' 1 'smtp:secondary@example.test')
+                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 `
+                    -proxyaddr 'smtp:secondary@example.test')
             )
         }
         Mock New-Object { return $mockedDirectorySearcher } `
@@ -122,7 +123,8 @@ Describe 'Get-ActiveDirectoryGroupMember' {
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
         } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (Add-TestUser 'primary@example.test' 'Test User' 1 'smtp:secondary@example.test  ')
+                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 `
+                    -proxyaddr 'smtp:secondary@example.test  ')
             )
         }
         Mock New-Object { return $mockedDirectorySearcher } `
@@ -130,5 +132,42 @@ Describe 'Get-ActiveDirectoryGroupMember' {
         $result = @(Get-ActiveDirectoryGroupMember $null $true 'TestPath')
         $result.Length | Should -Be 1
         $result[0].SecondaryEmails | Should -Be @('secondary@example.test')
+    }
+}
+
+Describe 'Select-ActiveDirectoryCommonName' {
+
+    It 'Should return the common name of a distinguished name' {
+        # From https://msdn.microsoft.com/en-us/windows/desktop/aa366101:
+        $result = 'CN=Jeff Smith,OU=Sales,DC=Fabrikam,DC=COM' | Select-ActiveDirectoryCommonName
+        $result | Should -Be 'Jeff Smith'
+
+        $result = 'CN=Karen Berge,CN=admin,DC=corp,DC=Fabrikam,DC=COM' | Select-ActiveDirectoryCommonName
+        $result | Should -Be 'Karen Berge'
+    }
+
+    It 'Should handle escaped characters' -TestCases @(
+        @{ TestString = 'CN=Foo\, Bar,OU=Test'; ExpectedResult = 'Foo, Bar' },
+        @{ TestString = 'CN=Foo\+ Bar,OU=Test'; ExpectedResult = 'Foo+ Bar' },
+        @{ TestString = 'CN=Foo\" Bar,OU=Test'; ExpectedResult = 'Foo" Bar' },
+        @{ TestString = 'CN=Foo\\ Bar,OU=Test'; ExpectedResult = 'Foo\ Bar' },
+        @{ TestString = 'CN=Foo\< Bar,OU=Test'; ExpectedResult = 'Foo< Bar' },
+        @{ TestString = 'CN=Foo\> Bar,OU=Test'; ExpectedResult = 'Foo> Bar' },
+        @{ TestString = 'CN=Foo\; Bar,OU=Test'; ExpectedResult = 'Foo; Bar' },
+        @{ TestString = 'CN=Foo\= Bar,OU=Test'; ExpectedResult = 'Foo= Bar' },
+        @{ TestString = 'CN=Foo\/ Bar,OU=Test'; ExpectedResult = 'Foo/ Bar' }
+    ) {
+        $result = $TestString | Select-ActiveDirectoryCommonName
+        $result | Should -Be $ExpectedResult
+    }
+
+    It 'Should handle empty strings' {
+        $result = '' | Select-ActiveDirectoryCommonName
+        $result | Should -BeNull
+    }
+
+    It 'Should handle input without common name' {
+        $result = 'Foo Bar Invalid String' | Select-ActiveDirectoryCommonName
+        $result | Should -BeNull
     }
 }

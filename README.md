@@ -50,6 +50,8 @@ automatically asks for elevated rights (if required).
     (corresponds to the WebAPI permissions
      `Account.Read`, `Account.ReadEmail`.
      Used to skip possible deactivation of API token owner.)
+  - (optional) _Group management_: _View, create, delete, edit and share groups_
+     Required when conditional access synchronization is enabled.
 
 * Parameter `ActiveDirectoryGroups`:
 
@@ -112,6 +114,16 @@ automatically asks for elevated rights (if required).
   user will also be taken into account when trying to map to a
   TeamViewer user.
 
+* Parameter `EnableConditionalAccessSync`:
+
+  If set to `true` the script attempts to synchronise the given AD groups and
+  their respective users with the directory groups for _conditional access_ in
+  TeamViewer. Those groups can then be used to restrict/allow TeamViewer
+  functionality for certain users.
+  The conditional access synchronization step runs after the user sync.
+  This option requires the API token to have additional permissions.
+  See point `ApiToken` above.
+
 
 ### Scheduled Task
 
@@ -145,6 +157,10 @@ into account for the mapping between AD users and TeamViewer users.
 
 
 ## Changelog
+
+### [1.3.0]
+
+- Added synchronization for TeamViewer Conditional Access directory groups.
 
 ### [1.2.2]
 - Added hint to options that require TeamViewer Tensor license.
@@ -184,6 +200,6 @@ into account for the mapping between AD users and TeamViewer users.
 
 ## License
 
-Copyright (c) 2018 TeamViewer GmbH
+Copyright (c) 2018-2020 TeamViewer GmbH
 
 See file `LICENSE`.

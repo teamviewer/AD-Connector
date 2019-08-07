@@ -1,4 +1,4 @@
-# Copyright (c) 2018 TeamViewer GmbH
+# Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
 function Invoke-LogfileRotation($folder, $basename, $retentionCount) {
