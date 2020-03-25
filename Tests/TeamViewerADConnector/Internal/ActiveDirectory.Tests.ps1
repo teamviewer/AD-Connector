@@ -8,9 +8,9 @@ Describe 'Get-ActiveDirectoryGroup' {
     It 'Should create and call a DirectorySearcher' {
         $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (@{} | Add-Member @{ Path = 'LDAP://TestPath3' } -PassThru),
-                (@{} | Add-Member @{ Path = 'LDAP://TestPath1' } -PassThru),
-                (@{} | Add-Member @{ Path = 'LDAP://TestPath2' } -PassThru)
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://TestPath3' } -PassThru),
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://TestPath1' } -PassThru),
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://TestPath2' } -PassThru)
             )
         }
         Mock New-Object { return $mockedDirectorySearcher } `
@@ -39,12 +39,12 @@ Describe 'Get-ActiveDirectoryGroup' {
     It 'Should handle servernames in the LDAP path' {
         $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (@{} | Add-Member @{ Path = 'LDAP://server1/TestPath1' } -PassThru),
-                (@{} | Add-Member @{ Path = 'LDAP://some.server2.test/TestPath2' } -PassThru),
-                (@{} | Add-Member @{ Path = 'LDAP://⌘.ws/TestPath3' } -PassThru),
-                (@{} | Add-Member @{ Path = 'LDAP://127.0.0.1/TestPath4' } -PassThru)
-                (@{} | Add-Member @{ Path = 'LDAP://server:1234/TestPath5' } -PassThru)
-                (@{} | Add-Member @{ Path = 'GC://myglobalcatalog/TestPath6' } -PassThru)
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://server1/TestPath1' } -PassThru),
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://some.server2.test/TestPath2' } -PassThru),
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://⌘.ws/TestPath3' } -PassThru),
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://127.0.0.1/TestPath4' } -PassThru)
+                ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://server:1234/TestPath5' } -PassThru)
+                ([pscustomobject]@{} | Add-Member @{ Path = 'GC://myglobalcatalog/TestPath6' } -PassThru)
             )
         }
         Mock New-Object { return $mockedDirectorySearcher } `
