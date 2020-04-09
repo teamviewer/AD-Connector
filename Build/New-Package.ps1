@@ -30,7 +30,7 @@ Get-Content ./README.md | `
 ConvertTo-Html `
     -Title (Get-Content $markdownReadmeFile -First 1).Trim('# ') `
     -PreContent (Get-Content ./Build/README.style.html | Out-String) `
-    -Body (Get-Content $markdownReadmeFile | Out-String | ConvertFrom-Markdown) | `
+    -Body (Get-Content $markdownReadmeFile | Out-String | ConvertFrom-Markdown).Html | `
     Set-Content (Join-Path $temporaryDirectory README.html)
 
 # Prepare package files
