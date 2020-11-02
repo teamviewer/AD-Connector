@@ -1,7 +1,9 @@
 ﻿# Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
-. "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\TeamViewer.ps1"
+BeforeAll {
+    . "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\TeamViewer.ps1"
+}
 
 Describe 'Invoke-TeamViewerRestMethod' {
 
@@ -18,7 +20,7 @@ Describe 'Invoke-TeamViewerRestMethod' {
         $testError = (@{ message = 'Some Error' })
         Mock -CommandName Invoke-RestMethod -MockWith { Throw ($testError | ConvertTo-Json) }
         Mock -CommandName ConvertTo-TeamViewerRestError -MockWith { return $testError }
-        { Invoke-TeamViewerRestMethod -Uri 'https://example.test' -Method Get } | Should -Throw $testError
+        { Invoke-TeamViewerRestMethod -Uri 'https://example.test' -Method Get } | Should -Throw "$testError*"
         Assert-MockCalled Invoke-RestMethod -Times 1
         Assert-MockCalled ConvertTo-TeamViewerRestError -Times 1
     }
@@ -39,7 +41,7 @@ Describe 'Invoke-TeamViewerPing' {
 
     It 'Should call the API ping REST endpoint' {
         Mock -CommandName Invoke-RestMethod -MockWith { return @{token_valid = $true } }
-        Invoke-TeamViewerPing 'TestAccessToken' | Should Be $true
+        Invoke-TeamViewerPing 'TestAccessToken' | Should -Be $true
         Assert-MockCalled Invoke-RestMethod -Times 1 -ParameterFilter {
             $Uri -And [System.Uri]$Uri.PathAndQuery -eq '/api/v1/ping' -And
             $Method -And $Method -eq 'Get'
@@ -48,7 +50,7 @@ Describe 'Invoke-TeamViewerPing' {
 
     It 'Should return false for invalid tokens' {
         Mock -CommandName Invoke-RestMethod -MockWith { return @{token_valid = $false } }
-        Invoke-TeamViewerPing 'TestAccessToken' | Should Be $false
+        Invoke-TeamViewerPing 'TestAccessToken' | Should -Be $false
     }
 
     It 'Should set the authorization header' {
@@ -61,14 +63,15 @@ Describe 'Invoke-TeamViewerPing' {
 }
 
 Describe 'Get-TeamViewerUser' {
-
-    Mock -CommandName Invoke-RestMethod -MockWith { return @{
-            'users' = @(
-                @{ email = 'test1@example.test'; name = 'Test User1' },
-                @{ email = 'test2@example.test'; name = 'Test User2' },
-                @{ email = 'test3@example.test'; name = 'Test User3' }
-            )
-        } }
+    BeforeAll {
+        Mock -CommandName Invoke-RestMethod -MockWith { return @{
+                'users' = @(
+                    @{ email = 'test1@example.test'; name = 'Test User1' },
+                    @{ email = 'test2@example.test'; name = 'Test User2' },
+                    @{ email = 'test3@example.test'; name = 'Test User3' }
+                )
+            } }
+    }
 
     It 'Should call the API users endpoint' {
         Get-TeamViewerUser 'TestAccessToken'
@@ -96,12 +99,13 @@ Describe 'Get-TeamViewerUser' {
 }
 
 Describe 'Add-TeamViewerUser' {
-
-    $testUser = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
-    $lastMockParams = @{ }
-    Mock -CommandName Invoke-RestMethod -MockWith {
-        $lastMockParams.Body = $Body
-        return $testUser
+    BeforeAll {
+        $testUser = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
+        $lastMockParams = @{ }
+        Mock -CommandName Invoke-RestMethod -MockWith {
+            $lastMockParams.Body = $Body
+            return $testUser
+        }
     }
 
     It 'Should call the API users endpoint' {
@@ -141,9 +145,10 @@ Describe 'Add-TeamViewerUser' {
 }
 
 Describe 'Edit-TeamViewerUser' {
-
-    $testUser = @{ 'id' = '1234'; 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
-    Mock -CommandName Invoke-WebRequest -MockWith { return @{Content = $testUser | ConvertTo-Json } }
+    BeforeAll {
+        $testUser = @{ 'id' = '1234'; 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
+        Mock -CommandName Invoke-WebRequest -MockWith { return @{Content = $testUser | ConvertTo-Json } }
+    }
 
     It 'Should call the API users endpoint' {
         $input = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
@@ -166,11 +171,12 @@ Describe 'Edit-TeamViewerUser' {
 }
 
 Describe 'Disable-TeamViewerUser' {
-
-    $lastMockParams = @{ }
-    Mock -CommandName Invoke-WebRequest -MockWith {
-        $lastMockParams.Body = $Body
-        return @{Content = "" }
+    BeforeAll {
+        $lastMockParams = @{ }
+        Mock -CommandName Invoke-WebRequest -MockWith {
+            $lastMockParams.Body = $Body
+            return @{Content = "" }
+        }
     }
 
     It 'Should call the API users endpoint' {
@@ -262,11 +268,13 @@ Describe 'Get-TeamViewerConditionalAccessGroup' {
 }
 
 Describe 'Add-TeamViewerConditionalAccessGroup' {
-    $testGroup = @{ 'groupId' = '706e0f01-d152-4e25-a417-d62fe3796044'; 'groupName' = 'test group name' }
-    $lastMockParams = @{ }
-    Mock -CommandName Invoke-RestMethod -MockWith {
-        $lastMockParams.Body = $Body
-        return $testGroup
+    BeforeAll {
+        $testGroup = @{ 'groupId' = '706e0f01-d152-4e25-a417-d62fe3796044'; 'groupName' = 'test group name' }
+        $lastMockParams = @{ }
+        Mock -CommandName Invoke-RestMethod -MockWith {
+            $lastMockParams.Body = $Body
+            return $testGroup
+        }
     }
 
     It 'Should call the API conditionalaccess endpoint' {
@@ -329,9 +337,11 @@ Describe 'Get-TeamViewerConditionalAccessGroupUser' {
 }
 
 Describe 'Add-TeamViewerConditionalAccessGroupUser' {
-    $lastMockParams = @{ }
-    Mock -CommandName Invoke-RestMethod -MockWith {
-        $lastMockParams.Body = $Body
+    BeforeAll {
+        $lastMockParams = @{ }
+        Mock -CommandName Invoke-RestMethod -MockWith {
+            $lastMockParams.Body = $Body
+        }
     }
 
     It 'Should call the API conditionalaccess members endpoint' {
@@ -361,10 +371,12 @@ Describe 'Add-TeamViewerConditionalAccessGroupUser' {
 }
 
 Describe 'Remove-TeamViewerConditionalAccessGroupUser' {
-    $lastMockParams = @{ }
-    Mock -CommandName Invoke-WebRequest -MockWith {
-        $lastMockParams.Body = $Body
-        return @{Content = ''}
+    BeforeAll {
+        $lastMockParams = @{ }
+        Mock -CommandName Invoke-WebRequest -MockWith {
+            $lastMockParams.Body = $Body
+            return @{Content = ''}
+        }
     }
 
     It 'Should call the API conditionalaccess members endpoint' {

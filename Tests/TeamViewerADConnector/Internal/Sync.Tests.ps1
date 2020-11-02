@@ -1,27 +1,31 @@
 # Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
-function Get-ActiveDirectoryGroupMember($root, $recursive, $path) { }
-function Select-ActiveDirectoryCommonName { }
-function Get-TeamViewerUser($accessToken) { }
-function Add-TeamViewerUser($accessToken, $user) { }
-function Edit-TeamViewerUser($accessToken, $userId, $user) { }
-function Disable-TeamViewerUser($accessToken, $userId) { }
-function Get-TeamViewerAccount($accessToken, [switch]$NoThrow) { }
-function Get-TeamViewerConditionalAccessGroup($accessToken) { }
-function Add-TeamViewerConditionalAccessGroup($accessToken, $groupName) { }
-function Get-TeamViewerConditionalAccessGroupUser($accessToken, $groupID) { }
-function Add-TeamViewerConditionalAccessGroupUser($accessToken, $groupID, $userIDs) { }
-function Remove-TeamViewerConditionalAccessGroupUser {
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
-    param($accessToken, $groupID, $userIDs)
-    if ($PSCmdlet.ShouldProcess($userIDs)) { }
+BeforeAll {
+    function Get-ActiveDirectoryGroupMember($root, $recursive, $path) { }
+    function Select-ActiveDirectoryCommonName { }
+    function Get-TeamViewerUser($accessToken) { }
+    function Add-TeamViewerUser($accessToken, $user) { }
+    function Edit-TeamViewerUser($accessToken, $userId, $user) { }
+    function Disable-TeamViewerUser($accessToken, $userId) { }
+    function Get-TeamViewerAccount($accessToken, [switch]$NoThrow) { }
+    function Get-TeamViewerConditionalAccessGroup($accessToken) { }
+    function Add-TeamViewerConditionalAccessGroup($accessToken, $groupName) { }
+    function Get-TeamViewerConditionalAccessGroupUser($accessToken, $groupID) { }
+    function Add-TeamViewerConditionalAccessGroupUser($accessToken, $groupID, $userIDs) { }
+    function Remove-TeamViewerConditionalAccessGroupUser {
+        [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
+        param($accessToken, $groupID, $userIDs)
+        if ($PSCmdlet.ShouldProcess($userIDs)) { }
+    }
+
+    . "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\Sync.ps1"
 }
 
-. "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\Sync.ps1"
-
 Describe 'Invoke-SyncPrework' {
-    Mock Write-Synclog { }
+    BeforeAll {
+        Mock Write-Synclog { }
+    }
 
     It 'Should get all configured AD groups' {
         Mock Get-ActiveDirectoryGroupMember { }
@@ -103,7 +107,9 @@ Describe 'Invoke-SyncPrework' {
 }
 
 Describe 'Invoke-SyncUser' {
-    Mock Write-Synclog { }
+    BeforeAll {
+        Mock Write-Synclog { }
+    }
 
     It 'Should create TeamViewer users from AD groups members' {
         Mock Add-TeamViewerUser { }
@@ -176,7 +182,9 @@ Describe 'Invoke-SyncUser' {
     }
 
     Context 'Account Types' {
-        Mock Add-TeamViewerUser { }
+        BeforeAll {
+            Mock Add-TeamViewerUser { }
+        }
 
         It 'Should create TeamViewer users with predefined password' {
             $configuration = @{
@@ -227,9 +235,11 @@ Describe 'Invoke-SyncUser' {
     }
 
     Context 'Secondary Email Addresses' {
-        Mock Add-TeamViewerUser { }
-        Mock Edit-TeamViewerUser { }
-        Mock Disable-TeamViewerUser { }
+        BeforeAll {
+            Mock Add-TeamViewerUser { }
+            Mock Edit-TeamViewerUser { }
+            Mock Disable-TeamViewerUser { }
+        }
 
         It 'Should match users with secondary email address' {
             $testUserAd = @{
@@ -270,14 +280,16 @@ Describe 'Invoke-SyncUser' {
 }
 
 Describe 'Invoke-SyncConditionalAccess' {
-    Mock Write-SyncLog { }
-    Mock Write-SyncProgress { }
-    Mock Select-ActiveDirectoryCommonName { return 'TestGroup' }
-    Mock Add-TeamViewerConditionalAccessGroupUser { }
-    Mock Add-TeamViewerConditionalAccessGroup {
-        return [pscustomobject]@{ name = 'TestGroup'; id = 'abc123' }
+    BeforeAll {
+        Mock Write-SyncLog { }
+        Mock Write-SyncProgress { }
+        Mock Select-ActiveDirectoryCommonName { return 'TestGroup' }
+        Mock Add-TeamViewerConditionalAccessGroupUser { }
+        Mock Add-TeamViewerConditionalAccessGroup {
+            return [pscustomobject]@{ name = 'TestGroup'; id = 'abc123' }
+        }
+        Mock Remove-TeamViewerConditionalAccessGroupUser { }
     }
-    Mock Remove-TeamViewerConditionalAccessGroupUser { }
 
     It 'Should create a conditional access group if not exists' {
         $syncContext = @{
@@ -372,9 +384,11 @@ Describe 'Invoke-SyncConditionalAccess' {
 }
 
 Describe 'Invoke-Sync' {
-    Mock Invoke-SyncPrework { }
-    Mock Invoke-SyncUser { }
-    Mock Invoke-SyncConditionalAccess { }
+    BeforeAll {
+        Mock Invoke-SyncPrework { }
+        Mock Invoke-SyncUser { }
+        Mock Invoke-SyncConditionalAccess { }
+    }
 
     It 'Should call the user sync operations' {
         Invoke-Sync @{ } { }

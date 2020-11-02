@@ -1,7 +1,9 @@
 ﻿# Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
-. "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\ActiveDirectory.ps1"
+BeforeAll {
+    . "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\ActiveDirectory.ps1"
+}
 
 Describe 'Get-ActiveDirectoryGroup' {
 
@@ -56,10 +58,11 @@ Describe 'Get-ActiveDirectoryGroup' {
 }
 
 Describe 'Get-ActiveDirectoryGroupMember' {
-
-    function Add-TestUser($mail, $name, $uac, $proxyaddr) {
-        return @{} | Add-Member -PassThru @{ Properties = @{
-                mail = $mail; name = $name; useraccountcontrol = @($uac); proxyaddresses = $proxyaddr
+    BeforeAll {
+        function Add-TestUser($mail, $name, $uac, $proxyaddr) {
+            return @{} | Add-Member -PassThru @{ Properties = @{
+                    mail = $mail; name = $name; useraccountcontrol = @($uac); proxyaddresses = $proxyaddr
+                }
             }
         }
     }

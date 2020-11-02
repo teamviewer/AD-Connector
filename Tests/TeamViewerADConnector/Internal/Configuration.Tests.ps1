@@ -1,7 +1,9 @@
 # Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
-. "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\Configuration.ps1"
+BeforeAll {
+    . "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\Configuration.ps1"
+}
 
 Describe 'Confirm-Configuration' {
 
