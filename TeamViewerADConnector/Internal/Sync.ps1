@@ -3,7 +3,9 @@
 
 function Write-SyncLog {
     param([Parameter(ValueFromPipeline)] $message, [Parameter()] $Extra)
-    Write-Output -InputObject @{Date = (Get-Date); Message = $message; Extra = $Extra } -NoEnumerate
+    Process {
+        Write-Output -InputObject @{Date = (Get-Date); Message = $message; Extra = $Extra } -NoEnumerate
+    }
 }
 
 function Format-SyncLog {
@@ -37,10 +39,12 @@ function ConvertTo-SyncUpdateUserChangeset($userTV, $userAD) {
 
 function Format-SyncUpdateUserChangeset {
     param([Parameter(ValueFromPipeline)] $changeset)
-    $message = ""
-    if ($changeset.name) { $message += "Changing name to '$($changeset.name)'. " }
-    if ($changeset.active) { $message += "Changing account status to 'active'. " }
-    "$message"
+    Process {
+        $message = ""
+        if ($changeset.name) { $message += "Changing name to '$($changeset.name)'. " }
+        if ($changeset.active) { $message += "Changing account status to 'active'. " }
+        "$message"
+    }
 }
 
 function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {

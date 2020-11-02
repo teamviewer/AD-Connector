@@ -109,8 +109,8 @@ Describe 'Add-TeamViewerUser' {
     }
 
     It 'Should call the API users endpoint' {
-        $input = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en' }
-        Add-TeamViewerUser 'TestAccessToken' $input | Should -Be $testUser
+        $inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en' }
+        Add-TeamViewerUser 'TestAccessToken' $inputData | Should -Be $testUser
         Assert-MockCalled Invoke-RestMethod -Times 1 -Scope It -ParameterFilter {
             $Uri -And [System.Uri]$Uri.PathAndQuery -eq '/api/v1/users' -And
             $Method -And $Method -eq 'Post'
@@ -118,17 +118,17 @@ Describe 'Add-TeamViewerUser' {
     }
 
     It 'Should throw if required fields are missing' {
-        $inputs = @(
+        $inputDatas = @(
             @{ 'email' = 'test1@example.test'; 'language' = 'en' }, # missing 'name'
             @{ 'name' = 'Test User 1'; 'language' = 'en' }, # missing 'email'
             @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' } # missing 'language'
         )
-        $inputs | ForEach-Object { { Add-TeamViewerUser 'TestAccessToken' $_ } | Should -Throw }
+        $inputDatas | ForEach-Object { { Add-TeamViewerUser 'TestAccessToken' $_ } | Should -Throw }
     }
 
     It 'Should encode the payload using UTF-8' {
-        $input = @{ 'name' = 'Test User Müller'; 'email' = 'test1@example.test'; 'language' = 'en' }
-        Add-TeamViewerUser 'TestAccessToken' $input
+        $inputData = @{ 'name' = 'Test User Müller'; 'email' = 'test1@example.test'; 'language' = 'en' }
+        Add-TeamViewerUser 'TestAccessToken' $inputData
         Assert-MockCalled Invoke-RestMethod -Times 1 -Scope It -ParameterFilter { $Body }
         { [System.Text.Encoding]::UTF8.GetString($lastMockParams.Body) } | Should -Not -Throw
         { [System.Text.Encoding]::UTF8.GetString($lastMockParams.Body) | ConvertFrom-Json } | Should -Not -Throw
@@ -136,8 +136,8 @@ Describe 'Add-TeamViewerUser' {
     }
 
     It 'Should set the authorization header' {
-        $input = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en' }
-        Add-TeamViewerUser 'TestAccessToken' $input
+        $inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en' }
+        Add-TeamViewerUser 'TestAccessToken' $inputData
         Assert-MockCalled Invoke-RestMethod -Times 1 -Scope It -ParameterFilter {
             $Headers -And $Headers.ContainsKey('authorization') -And $Headers.authorization -eq 'Bearer TestAccessToken'
         }
@@ -151,8 +151,8 @@ Describe 'Edit-TeamViewerUser' {
     }
 
     It 'Should call the API users endpoint' {
-        $input = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
-        $result = (Edit-TeamViewerUser 'TestAccessToken' 1234 $input)
+        $inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
+        $result = (Edit-TeamViewerUser 'TestAccessToken' 1234 $inputData)
         $result.id | Should -Be $testUser.id
         $result.name | Should -Be $testUser.name
         Assert-MockCalled Invoke-WebRequest -Times 1 -Scope It -ParameterFilter {
@@ -162,8 +162,8 @@ Describe 'Edit-TeamViewerUser' {
     }
 
     It 'Should set the authorization header' {
-        $input = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
-        Edit-TeamViewerUser 'TestAccessToken' 1234 $input
+        $inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test' }
+        Edit-TeamViewerUser 'TestAccessToken' 1234 $inputData
         Assert-MockCalled Invoke-WebRequest -Times 1 -Scope It -ParameterFilter {
             $Headers -And $Headers.ContainsKey('authorization') -And $Headers.authorization -eq 'Bearer TestAccessToken'
         }
