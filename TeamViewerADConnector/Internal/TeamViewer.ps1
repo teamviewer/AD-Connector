@@ -11,6 +11,8 @@ function ConvertTo-TeamViewerRestError {
 }
 
 function Invoke-TeamViewerRestMethod {
+    # TeamViewer Web API requires TLS 1.2
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $method = (& { param($Method) $Method } @args)
     if ($method -in "Put", "Delete") {
         # There is a known issue for PUT and DELETE operations to hang on Windows Server 2012.
