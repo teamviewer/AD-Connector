@@ -1,13 +1,16 @@
 # Copyright (c) 2018-2020 TeamViewer GmbH
 # See file LICENSE
 
-. "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\Logfile.ps1"
+BeforeAll {
+    . "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\Logfile.ps1"
+}
 
 Describe 'Invoke-LogfileRotation' {
-
-    function Add-TestFile($path, $creationTime) {
-        New-Item $path -ItemType File
-        (Get-ChildItem $path).CreationTime = $creationTime
+    BeforeAll {
+        function Add-TestFile($path, $creationTime) {
+            New-Item $path -ItemType File
+            (Get-ChildItem $path).CreationTime = $creationTime
+        }
     }
 
     It 'Should rollover old files' {
