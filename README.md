@@ -158,6 +158,10 @@ into account for the mapping between AD users and TeamViewer users.
 
 ## Changelog
 
+### [1.3.1]
+
+- Fixed TeamViewer API calls to use TLS 1.2.
+
 ### [1.3.0]
 
 - Added synchronization for TeamViewer Conditional Access directory groups.
