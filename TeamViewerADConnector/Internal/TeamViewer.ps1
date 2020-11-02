@@ -6,8 +6,10 @@ $tvApiBaseUrl = "https://webapi.teamviewer.com"
 
 function ConvertTo-TeamViewerRestError {
     param([parameter(ValueFromPipeline)]$err)
-    try { return ($err | Out-String | ConvertFrom-Json) }
-    catch { return $err }
+    Process {
+        try { return ($err | Out-String | ConvertFrom-Json) }
+        catch { return $err }
+    }
 }
 
 function Invoke-TeamViewerRestMethod {

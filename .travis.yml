@@ -16,4 +16,4 @@ script:
   - docker run -v ${TRAVIS_BUILD_DIR}:/tmp/src/ mcr.microsoft.com/powershell:7.0.0-alpine-3.10 pwsh -c "
       \$ProgressPreference='SilentlyContinue';
       Install-Module PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser;
-      Invoke-ScriptAnalyzer -Path /tmp/src -Recurse -ReportSummary -EnableExit;"
+      Invoke-ScriptAnalyzer -Path /tmp/src -Recurse -ReportSummary -EnableExit -ExcludeRule PSReviewUnusedParameter;"

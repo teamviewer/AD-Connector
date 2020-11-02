@@ -8,41 +8,41 @@ BeforeAll {
 Describe 'Confirm-Configuration' {
 
     It 'Should throw if DefaultPassword and SsoCustomerId are used in conjunction' {
-        $input = @{
+        $inputData = @{
             UseDefaultPassword = $true; DefaultPassword = 'Test123'
             UseSsoCustomerId = $true; SsoCustomerId = 'TestCustomer'
         }
-        { Confirm-Configuration $input } | Should -Throw
+        { Confirm-Configuration $inputData } | Should -Throw
     }
 
     It 'Should throw if DefaultPassword and GeneratePassword are used in conjunction' {
-        $input = @{
+        $inputData = @{
             UseGeneratedPassword = $true
             UseDefaultPassword = $true; DefaultPassword = 'Test123'
         }
-        { Confirm-Configuration $input } | Should -Throw
+        { Confirm-Configuration $inputData } | Should -Throw
     }
 
     It 'Should throw if SsoCustomerId and GeneratePassword are used in conjunction' {
-        $input = @{
+        $inputData = @{
             UseGeneratedPassword = $true
             UseSsoCustomerId = $true; SsoCustomerId = 'TestCustomer'
         }
-        { Confirm-Configuration $input } | Should -Throw
+        { Confirm-Configuration $inputData } | Should -Throw
     }
 
     It 'Should throw if neither DefaultPassword, GeneratePassword nor SsoCustomerId are set' {
-        $input = @{}
-        { Confirm-Configuration $input } | Should -Throw
+        $inputData = @{}
+        { Confirm-Configuration $inputData } | Should -Throw
     }
 
     It 'Should throw if DefaultPassword is configured but empty' {
-        $input = @{ UseDefaultPassword = $true; DefaultPassword = '' }
-        { Confirm-Configuration $input } | Should -Throw
+        $inputData = @{ UseDefaultPassword = $true; DefaultPassword = '' }
+        { Confirm-Configuration $inputData } | Should -Throw
     }
 
     It 'Should throw if SsoCustomerId is configured by empty' {
-        $input = @{ UseSsoCustomerId = $true; SsoCustomerId = '' }
-        { Confirm-Configuration $input } | Should -Throw
+        $inputData = @{ UseSsoCustomerId = $true; SsoCustomerId = '' }
+        { Confirm-Configuration $inputData } | Should -Throw
     }
 }

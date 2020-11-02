@@ -15,6 +15,8 @@ BeforeAll {
     function Add-TeamViewerConditionalAccessGroupUser($accessToken, $groupID, $userIDs) { }
     function Remove-TeamViewerConditionalAccessGroupUser {
         [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'accessToken', Justification = 'Needs to be mockable')]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'groupID', Justification = 'Needs to be mockable')]
         param($accessToken, $groupID, $userIDs)
         if ($PSCmdlet.ShouldProcess($userIDs)) { }
     }
