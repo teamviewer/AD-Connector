@@ -204,6 +204,6 @@ into account for the mapping between AD users and TeamViewer users.
 
 ## License
 
-Copyright (c) 2018-2020 TeamViewer GmbH
+Copyright (c) 2018-2020 TeamViewer Germany GmbH
 
 See file `LICENSE`.
