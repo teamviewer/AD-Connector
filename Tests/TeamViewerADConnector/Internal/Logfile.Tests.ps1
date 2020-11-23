@@ -1,4 +1,4 @@
-# Copyright (c) 2018-2020 TeamViewer GmbH
+# Copyright (c) 2018-2020 TeamViewer Germany GmbH
 # See file LICENSE
 
 BeforeAll {
