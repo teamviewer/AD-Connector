@@ -49,7 +49,7 @@
     Output the version of the script and exit.
 
  .NOTES
-    Copyright (c) 2018-2020 TeamViewer GmbH
+    Copyright (c) 2018-2020 TeamViewer Germany GmbH
     See file LICENSE
     Version {ScriptVersion}
 #>
