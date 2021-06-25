@@ -3,7 +3,7 @@
 A PowerShell integration script to synchronize users of an Active Directory (AD) group to a TeamViewer company via REST based API.
 
 <!--[+github]-->
-[![Build Status](https://travis-ci.org/TeamViewer/AD-Connector.svg?branch=master)](https://travis-ci.org/TeamViewer/AD-Connector)
+[![Build Status](https://github.com/teamviewer/AD-Connector/actions/workflows/ci.yml/badge.svg)](https://github.com/teamviewer/AD-Connector/actions/workflows/ci.yml)
 <!--[-github]-->
 
 Further information can be found in the knowledge base article "[Active Directory Connector](https://community.teamviewer.com/t5/Knowledge-Base/Active-Directory-Connector-AD-Connector/ta-p/31158)".
