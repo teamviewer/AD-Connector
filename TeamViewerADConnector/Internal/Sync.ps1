@@ -47,6 +47,13 @@ function Format-SyncUpdateUserChangeset {
     }
 }
 
+function Split-Bulk {
+	param([int]$Size)
+	Begin { $bulk = New-Object System.Collections.ArrayList($Size) }
+	Process { $bulk.Add($_) | Out-Null; if ($bulk.Count -ge $Size) { ,$bulk.Clone(); $bulk.Clear() } }
+	End { if ($bulk.Count -gt 0) { ,$bulk } }
+}
+
 function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
     # Fetch users from configured AD groups.
     # Map the AD user objects to all their email addresses.
@@ -283,14 +290,19 @@ function Invoke-SyncConditionalAccess($syncContext, $configuration, $progressHan
         }
         Write-SyncLog "Adding $($usersToAdd.Count) users to conditional access group '$($caGroup.name)'"
         if (!$configuration.TestRun -And $usersToAdd.Count -Gt 0) {
-            try {
-                (Add-TeamViewerConditionalAccessGroupUser $configuration.ApiToken $caGroup.id $usersToAdd) | Out-Null
-                $statistics.AddedMembers += $usersToAdd.Count
-            }
-            catch {
-                Write-SyncLog "Failed to add members to conditional access group '$($caGroup.name)': $_"
-                $statistics.Failed += $usersToAdd.Count
-            }
+            $usersToAdd | `
+                Split-Bulk -Size 50 | `
+                ForEach-Object {
+                    $currentUsersToAdd = $_
+                    try {
+                        (Add-TeamViewerConditionalAccessGroupUser $configuration.ApiToken $caGroup.id $currentUsersToAdd) | Out-Null
+                        $statistics.AddedMembers += $currentUsersToAdd.Count
+                    }
+                    catch {
+                        Write-SyncLog "Failed to add members to conditional access group '$($caGroup.name)': $_"
+                        $statistics.Failed += $currentUsersToAdd.Count
+                    }
+                }
         }
         else { $statistics.AddedMembers += $usersToAdd.Count }
 
@@ -305,14 +317,19 @@ function Invoke-SyncConditionalAccess($syncContext, $configuration, $progressHan
         }
         Write-SyncLog "Removing $($usersToRemove.Count) users from conditional access group '$($caGroup.name)'"
         if (!$configuration.TestRun -And $usersToRemove.Count -Gt 0) {
-            try {
-                (Remove-TeamViewerConditionalAccessGroupUser $configuration.ApiToken $caGroup.id $usersToRemove) | Out-Null
-                $statistics.RemovedMembers += $usersToRemove.Count
-            }
-            catch {
-                Write-SyncLog "Failed to remove members from conditional access group '$($caGroup.name)': $_"
-                $statistics.Failed += $usersToRemove.Count
-            }
+            $usersToRemove | `
+                Split-Bulk -Size 50 | `
+                ForEach-Object {
+                    $currentUsersToRemove = $_
+                    try {
+                        (Remove-TeamViewerConditionalAccessGroupUser $configuration.ApiToken $caGroup.id $currentUsersToRemove) | Out-Null
+                        $statistics.RemovedMembers += $currentUsersToRemove.Count
+                    }
+                    catch {
+                        Write-SyncLog "Failed to remove members from conditional access group '$($caGroup.name)': $_"
+                        $statistics.Failed += $currentUsersToRemove.Count
+                    }
+                }
         }
         else { $statistics.RemovedMembers += $usersToRemove.Count }
     }
