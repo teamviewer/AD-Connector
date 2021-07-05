@@ -1,4 +1,4 @@
-# Copyright (c) 2018-2020 TeamViewer GmbH
+# Copyright (c) 2018-2021 TeamViewer Germany GmbH
 # See file LICENSE
 
 [void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework')
