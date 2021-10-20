@@ -18,6 +18,7 @@ function Import-Configuration($filename) {
         UseSecondaryEmails          = $true
         EnableConditionalAccessSync = $false
         EnableUserGroupsSync        = $false
+        MeetingLicenseKey           = ''
     }
     if (Test-Path $filename) {
         $configuration = (Get-Content $filename | Out-String | ConvertFrom-Json)
@@ -48,4 +49,6 @@ function Confirm-Configuration($config) {
     if ($config.UseSsoCustomerId -And [string]::IsNullOrWhiteSpace($config.SsoCustomerId)) {
         Throw "The parameter 'SsoCustomerId' cannot be empty if 'UseSsoCustomerId' is configured."
     }
+    # Verify $config.MeetingLicenseKey is a valid guid
+    ![string]::IsNullOrWhiteSpace($config.MeetingLicenseKey) -And [guid]$config.MeetingLicenseKey | Out-Null
 }

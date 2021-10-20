@@ -195,6 +195,9 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                 if ($configuration.UseSsoCustomerId) {
                     $newUser.sso_customer_id = $configuration.SsoCustomerId;
                 }
+                if ($configuration.MeetingLicenseKey) {
+                    $newUser.meeting_license_key = $configuration.MeetingLicenseKey;
+                }
                 try {
                     $addedUser = (Add-TeamViewerUser $configuration.ApiToken $newUser)
                     $newUser.id = $addedUser.id

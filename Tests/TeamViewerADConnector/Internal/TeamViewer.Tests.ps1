@@ -142,6 +142,15 @@ Describe 'Add-TeamViewerUser' {
             $Headers -And $Headers.ContainsKey('authorization') -And $Headers.authorization -eq 'Bearer TestAccessToken'
         }
     }
+
+    It 'Should include meeting license key in rest call if present' -ForEach @(
+        @{ inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en'; 'meeting_license_key' = '4d00238a-9391-44cd-88ab-631194a97de5' } }
+        @{ inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en' }}
+    ) {
+        Add-TeamViewerUser 'TestAccessToken' $inputData
+        Assert-MockCalled Invoke-RestMethod -Times 1 -Scope It
+        ([System.Text.Encoding]::UTF8.GetString($lastMockParams.Body) | ConvertFrom-Json).meeting_license_key | Should -Be $inputData.meeting_license_key
+    }
 }
 
 Describe 'Edit-TeamViewerUser' {
