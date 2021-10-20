@@ -45,4 +45,21 @@ Describe 'Confirm-Configuration' {
         $inputData = @{ UseSsoCustomerId = $true; SsoCustomerId = '' }
         { Confirm-Configuration $inputData } | Should -Throw
     }
+
+    It 'Should throw if MeetingLicenseKey is set, but not a valid guid' -ForEach @(
+        @{ MeetingLicenseKey = '1234-5678-90' }
+        @{ MeetingLicenseKey = 'Core' }
+    ) {
+        $inputData = @{ MeetingLicenseKey = $MeetingLicenseKey; UseGeneratedPassword = $true }
+        { Confirm-Configuration $inputData } | Should -Throw
+    }
+
+    It 'Should not throw if MeetingLicenseKey is empty or valid guid' -ForEach @(
+        @{ MeetingLicenseKey = '4d00238a-9391-44cd-88ab-631194a97de5'}
+        @{ MeetingLicenseKey = '{3D4E067E-68DB-4E18-BAF6-146780DBA174}'}
+        @{ MeetingLicenseKey = ''}
+    ) {
+        $inputData = @{ MeetingLicenseKey = $MeetingLicenseKey; UseGeneratedPassword = $true }
+        { Confirm-Configuration $inputData } | Should -Not -Throw
+    }
 }

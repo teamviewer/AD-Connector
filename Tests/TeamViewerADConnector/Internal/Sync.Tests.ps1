@@ -248,6 +248,42 @@ Describe 'Invoke-SyncUser' {
         }
     }
 
+    Context 'Meeting License Key' {
+        BeforeAll {
+            $MeetingLicenseKey = '4d00238a-9391-44cd-88ab-631194a97de5'
+            $null = $MeetingLicenseKey
+        }
+
+        BeforeEach {
+            $configuration = @{
+                MeetingLicenseKey = $MeetingLicenseKey
+            }
+            $null = $configuration
+            $syncContext = @{
+                UsersActiveDirectory   = @(@{ Email = 'user1@example.test' })
+                UsersTeamViewerByEmail = @{ }
+            }
+            $null = $syncContext
+        }
+
+        It 'Should set meeting license on new user passed to Add-TeamViewerUser' {
+            Mock Add-TeamViewerUser { }
+
+            Invoke-SyncUser $syncContext $configuration { }
+            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
+                -ParameterFilter { $user -And $user.meeting_license_key -eq $configuration.MeetingLicenseKey }
+        }
+
+        It 'Should not be set non-existent meeting license on new user passed to Add-TeamViewerUser' {
+            Mock Add-TeamViewerUser { }
+            $configuration.Remove('MeetingLicenseKey')
+
+            Invoke-SyncUser $syncContext $configuration { }
+            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
+                -ParameterFilter { $user -And -Not $user.meeting_license_key }
+        }
+    }
+
     Context 'Secondary Email Addresses' {
         BeforeAll {
             Mock Add-TeamViewerUser { }
