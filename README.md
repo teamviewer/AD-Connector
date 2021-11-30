@@ -169,6 +169,10 @@ into account for the mapping between AD users and TeamViewer users.
 
 ## Changelog
 
+### [1.4.1]
+
+- Fixed missing German translation of TeamViewer user groups synchronization option.
+
 ### [1.4.0]
 
 - Added optional synchronization of TeamViewer user groups.
