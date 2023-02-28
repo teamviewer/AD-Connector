@@ -52,14 +52,14 @@ function Add-TeamViewerUser($accessToken, $user) {
         Throw "Cannot create user! Missing required fields [$missingFields]!"
     }
     $payload = @{ }
-    @('email', 'password', 'permissions', 'name', 'language', 'sso_customer_id', 'meeting_license_key') | Where-Object { $user[$_] } | ForEach-Object { $payload[$_] = $user[$_] }
+    @('email', 'password', 'name', 'language', 'sso_customer_id', 'meeting_license_key') | Where-Object { $user[$_] } | ForEach-Object { $payload[$_] = $user[$_] }
     return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/users" -Method Post -Headers @{authorization = "Bearer $accessToken" } `
         -ContentType "application/json; charset=utf-8" -Body ([System.Text.Encoding]::UTF8.GetBytes(($payload | ConvertTo-Json)))
 }
 
 function Edit-TeamViewerUser($accessToken, $userId, $user) {
     $payload = @{ }
-    @('email', 'name', 'permissions', 'password', 'active') | Where-Object { $user[$_] } | ForEach-Object { $payload[$_] = $user[$_] }
+    @('email', 'name', 'password', 'active') | Where-Object { $user[$_] } | ForEach-Object { $payload[$_] = $user[$_] }
     return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/users/$userId" -Method Put -Headers @{authorization = "Bearer $accessToken" } `
         -ContentType "application/json; charset=utf-8" -Body ([System.Text.Encoding]::UTF8.GetBytes(($payload | ConvertTo-Json)))
 }
