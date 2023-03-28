@@ -86,9 +86,7 @@ if ($PassThru) {
    Invoke-Sync $configuration $ProgressHandler
 }
 elseif ($LogfileDirectory -And $LogfileBasename -And $LogfileRetentionCount -gt 0) {
-   Invoke-Sync $configuration $ProgressHandler `
-   | Format-SyncLog `
-   | Out-Logfile $LogfileDirectory $LogfileBasename
+   Invoke-Sync $configuration $ProgressHandler | Format-SyncLog | Out-Logfile $LogfileDirectory $LogfileBasename
    Invoke-LogfileRotation $LogfileDirectory $LogfileBasename $LogfileRetentionCount
 }
 else {
