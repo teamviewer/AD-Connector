@@ -3,7 +3,7 @@
     "files.eol": "\r\n",
     "files.encoding": "utf8",
     "files.insertFinalNewline": true,
-    "editor.tabSize": 4,
+	"files.trimTrailingWhitespace": true,
 
     // https://en.wikipedia.org/wiki/Indentation_style#Styles
     "powershell.codeFormatting.autoCorrectAliases": true,
