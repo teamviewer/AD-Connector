@@ -26,7 +26,7 @@ The graphical configuration provides the following features:
 The graphical configuration requires to be run with elevated user rights to be able to install and uninstall the scheduled task.
 The script automatically asks for elevated rights (if required).
 
-### Available Configuration Parameters
+### Configuration Parameters
 
 - Parameter `ApiToken`:
 
@@ -103,19 +103,13 @@ The scheduled task will be created with the specified interval as:
 
 Output of the scheduled task is redirected to the configured log file location.
 
-## User Synchronization Logic
+## Synchronization Logic
 
 The actual synchronization is done by the `Invoke-Sync.ps1` script in the `TeamViewerADConnector` directory using the following logic:
 
-- Users of the configured AD group that are not yet part of the
-  configured TeamViewer company (identified by the API token) will be
-  created with the specified initial password.
-- Users of the configured AD group that are already part of the
-  configured TeamViewer company will be activated and/or updated if the
-  name of the user has been changed or the TeamViewer user is
-  deactivated.
-- If configured, users of the TeamViewer company that are not present in
-  the configured AD group will be deactivated.
+- Users of the configured AD group that are not yet part of the configured TeamViewer company (identified by the API token) will be created with the specified initial password.
+- Users of the configured AD group that are already part of the configured TeamViewer company will be activated and/or updated if the name of the user has been changed or the TeamViewer user is deactivated.
+- If configured, users of the TeamViewer company that are not present in the configured AD group will be deactivated.
 
 Identification of users is done based on the email addresses. If configured, the secondary email addresses of AD users are also taken into account for the mapping between AD users and TeamViewer users.
 
@@ -123,6 +117,7 @@ Identification of users is done based on the email addresses. If configured, the
 
 ### [1.5.0]
 
+- Updated year in copyright
 - Removed Conditional Access synchronization support.
 
 ### [1.4.1]
@@ -159,7 +154,7 @@ Identification of users is done based on the email addresses. If configured, the
 ### [1.2.0]
 
 - Added configuration field `UseGeneratedPassword` to create user accounts with a generated password. Such users will receive an email to reset their password.
-- Added optional lookup for token owner to avoid accidential deactivation of the account that owns the configured API token. This requires additional token permissions.
+- Added optional lookup for token owner to avoid accidental deactivation of the account that owns the configured API token. This requires additional token permissions.
 - Version number is now printed to the log file and title bar.
 - Run in graphical user interface can now be cancelled.
 - Fixed AD user list to filter-out duplicate users (by email).
