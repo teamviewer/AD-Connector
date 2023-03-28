@@ -31,6 +31,16 @@ ConvertTo-Html `
     -Title (Get-Content $markdownReadmeFile -First 1).Trim('# ') -PreContent (Get-Content ./Build/README.style.html | Out-String) `
     -Body (Get-Content $markdownReadmeFile | Out-String | ConvertFrom-Markdown).Html | Set-Content (Join-Path $temporaryDirectory README.html)
 
+# Markdown ChangeLog File
+$markdownChangeLogFile = (Join-Path $temporaryDirectory CHANGELOG.md)
+
+Get-Content ./CHANGELOG.md | Select-StringExcludeBlock -Begin '[+github]' -End '[-github]' | Set-Content $markdownChangeLogFile
+
+# HTML ChangeLog File
+ConvertTo-Html `
+    -Title (Get-Content $markdownChangeLogFile -First 1).Trim('# ') -PreContent (Get-Content ./Build/README.style.html | Out-String) `
+    -Body (Get-Content $markdownChangeLogFile | Out-String | ConvertFrom-Markdown).Html | Set-Content (Join-Path $temporaryDirectory CHANGELOG.html)
+
 # Prepare package files
 Copy-Item ./TeamViewerADConnector -Destination $temporaryDirectory -Recurse
 Copy-Item ./LICENSE.txt -Destination $temporaryDirectory
