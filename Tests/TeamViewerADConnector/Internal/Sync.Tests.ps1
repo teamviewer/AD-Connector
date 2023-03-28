@@ -263,9 +263,9 @@ Describe 'Invoke-SyncUser' {
                 SecondaryEmails = @('user1_secondary@example.test')
             }
             $testUserTv = @{
-                id     = '123';
-                email  = 'user1_secondary@example.test';
-                name   = 'User 1';
+                id     = '123'
+                email  = 'user1_secondary@example.test'
+                name   = 'User 1'
                 active = $true
             }
             $syncContext = @{
@@ -428,7 +428,7 @@ Describe 'Invoke-SyncUserGroups' {
     }
 
     It 'Should create bulks of 100 when removing members from a user group' {
-        $testUserGroupMembers = (1..220 | ForEach-Object {  [pscustomobject]@{ accountId = $_ } })
+        $testUserGroupMembers = (1..220 | ForEach-Object { [pscustomobject]@{ accountId = $_ } })
         $testUserGroupMembers.Count | Should -Be 220
         $testSyncContext = @{
             UsersActiveDirectoryByGroup = @{}

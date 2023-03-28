@@ -145,7 +145,7 @@ Describe 'Add-TeamViewerUser' {
 
     It 'Should include meeting license key in rest call if present' -ForEach @(
         @{ inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en'; 'meeting_license_key' = '4d00238a-9391-44cd-88ab-631194a97de5' } }
-        @{ inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en' }}
+        @{ inputData = @{ 'name' = 'Test User 1'; 'email' = 'test1@example.test'; 'language' = 'en' } }
     ) {
         Add-TeamViewerUser 'TestAccessToken' $inputData
         Assert-MockCalled Invoke-RestMethod -Times 1 -Scope It
@@ -184,7 +184,7 @@ Describe 'Disable-TeamViewerUser' {
         $lastMockParams = @{ }
         Mock -CommandName Invoke-WebRequest -MockWith {
             $lastMockParams.Body = $Body
-            return @{Content = "" }
+            return @{Content = '' }
         }
     }
 
@@ -262,13 +262,13 @@ Describe 'Get-TeamViewerConditionalAccessGroup' {
                 directory_groups   = @(
                     @{ id = '123'; name = 'Group 1' },
                     @{ id = '456'; name = 'Group 2' }
-                );
-                continuation_token = 'token1';
+                )
+                continuation_token = 'token1'
             } }
         Mock -CommandName Invoke-RestMethod -MockWith { @{
                 directory_groups = @(
                     @{ id = '789'; name = 'Group 3' }
-                );
+                )
             } } -ParameterFilter { $Body.continuation_token -Eq 'token1' }
         $result = @(Get-TeamViewerConditionalAccessGroup 'TestAccessToken')
         $result | Should -HaveCount 3
@@ -331,13 +331,13 @@ Describe 'Get-TeamViewerConditionalAccessGroupUser' {
         Mock -CommandName Invoke-RestMethod -MockWith { @{
                 directory_group    = @{
                     user_ids = @( 'u123', 'u456' )
-                };
-                continuation_token = 'token1';
+                }
+                continuation_token = 'token1'
             } }
         Mock -CommandName Invoke-RestMethod -MockWith { @{
                 directory_group = @{
                     user_ids = @( 'u789' )
-                };
+                }
             } } -ParameterFilter { $Body.continuation_token -Eq 'token1' }
         $result = @(Get-TeamViewerConditionalAccessGroupUser 'TestAccessToken' '0713e6bd-4bae-4067-93ad-c2ac8c66d469')
         $result | Should -HaveCount 3

@@ -5,8 +5,7 @@
  .DESCRIPTION
     This script will start the graphical user interface to configure the TeamViewer AD Connector script.
     It allows to update the configuration and store it to the configuration file.
-    Also it is possible to trigger a run of the TeamViewer AD Connector synchronization script from
-    within the graphical user interface.
+    Also it is possible to trigger a run of the TeamViewer AD Connector synchronization script from within the graphical user interface.
     In addition, this script allows to setup a scheduled task to run TeamViewer AD Connector regularly.
 
  .PARAMETER ConfigurationFile
