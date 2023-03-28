@@ -1,13 +1,13 @@
 <#
  .SYNOPSIS
-    Opens a graphical user interface for setting the configuration of the TeamViewer AD-Connector script.
+    Opens a graphical user interface for setting the configuration of the TeamViewer AD Connector script.
 
  .DESCRIPTION
-    This script will start the graphical user interface to configure the TeamViewer AD-Connector script.
+    This script will start the graphical user interface to configure the TeamViewer AD Connector script.
     It allows to update the configuration and store it to the configuration file.
-    Also it is possible to trigger a run of the TeamViewer AD-Connector synchronization script from
+    Also it is possible to trigger a run of the TeamViewer AD Connector synchronization script from
     within the graphical user interface.
-    In addition, this script allows to setup a scheduled task to run TeamViewer AD-Connector regularly.
+    In addition, this script allows to setup a scheduled task to run TeamViewer AD Connector regularly.
 
  .PARAMETER ConfigurationFile
     The path to the configuration file to use.
@@ -28,27 +28,27 @@
 #>
 
 param(
-    [string]
-    $ConfigurationFile = (Join-Path $PSScriptRoot "TeamViewerADConnector.config.json"),
+   [string]
+   $ConfigurationFile = (Join-Path $PSScriptRoot 'TeamViewerADConnector.config.json'),
 
-    [string]
-    $Culture = (Get-Culture).TwoLetterISOLanguageName,
+   [string]
+   $Culture = (Get-Culture).TwoLetterISOLanguageName,
 
-    [switch]
-    $Version
+   [switch]
+   $Version
 )
 
-$ScriptVersion = "{ScriptVersion}"
+$ScriptVersion = '{ScriptVersion}'
 
 if ($Version) {
-    Write-Output $ScriptVersion
-    return
+   Write-Output $ScriptVersion
+   return
 }
 
 $principal = (New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent()))
 if (!$principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process powershell -Verb runAs -ArgumentList "& '$($script:MyInvocation.MyCommand.Definition)'"
-    exit 0
+   Start-Process powershell -Verb runAs -ArgumentList "& '$($script:MyInvocation.MyCommand.Definition)'"
+   exit 0
 }
 
 (. "$PSScriptRoot\Internal\Configuration.ps1")

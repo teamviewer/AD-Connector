@@ -1,9 +1,9 @@
 <#
  .SYNOPSIS
-    Runs the TeamViewer AD-Connector synchronization with the given configuration.
+    Runs the TeamViewer AD Connector synchronization with the given configuration.
 
  .DESCRIPTION
-    This script runs the TeamViewer AD-Connector synchronization script using the
+    This script runs the TeamViewer AD Connector synchronization script using the
     values in the given configuration file.
     It compares the list of users of the configured AD group with the users in the
     TeamViewer company that belongs to the configured TeamViewer API token.
@@ -55,31 +55,31 @@
 #>
 
 param(
-    [string]
-    $ConfigurationFile = (Join-Path $PSScriptRoot "TeamViewerADConnector.config.json"),
+   [string]
+   $ConfigurationFile = (Join-Path $PSScriptRoot 'TeamViewerADConnector.config.json'),
 
-    [ScriptBlock]
-    $ProgressHandler = {},
+   [ScriptBlock]
+   $ProgressHandler = {},
 
-    [string]
-    $LogfileDirectory,
+   [string]
+   $LogfileDirectory,
 
-    [string]
-    $LogfileBasename = "TeamViewerADConnector_",
+   [string]
+   $LogfileBasename = 'TeamViewerADConnector_',
 
-    [int]
-    $LogfileRetentionCount = 14,
+   [int]
+   $LogfileRetentionCount = 14,
 
-    [switch]
-    $PassThru,
+   [switch]
+   $PassThru,
 
-    [switch]
-    $Version
+   [switch]
+   $Version
 )
 
 $script:ErrorActionPreference = 'Stop'
 
-$ScriptVersion = "{ScriptVersion}"
+$ScriptVersion = '{ScriptVersion}'
 
 (. "$PSScriptRoot\Internal\Configuration.ps1")
 (. "$PSScriptRoot\Internal\ActiveDirectory.ps1")
@@ -88,21 +88,21 @@ $ScriptVersion = "{ScriptVersion}"
 (. "$PSScriptRoot\Internal\Logfile.ps1")
 
 if ($Version) {
-    Write-Output $ScriptVersion
-    return
+   Write-Output $ScriptVersion
+   return
 }
 
 $configuration = (Import-Configuration $ConfigurationFile)
 Confirm-Configuration $configuration
 if ($PassThru) {
-    Invoke-Sync $configuration $ProgressHandler
+   Invoke-Sync $configuration $ProgressHandler
 }
 elseif ($LogfileDirectory -And $LogfileBasename -And $LogfileRetentionCount -gt 0) {
-    Invoke-Sync $configuration $ProgressHandler `
-        | Format-SyncLog `
-        | Out-Logfile $LogfileDirectory $LogfileBasename
-    Invoke-LogfileRotation $LogfileDirectory $LogfileBasename $LogfileRetentionCount
+   Invoke-Sync $configuration $ProgressHandler `
+   | Format-SyncLog `
+   | Out-Logfile $LogfileDirectory $LogfileBasename
+   Invoke-LogfileRotation $LogfileDirectory $LogfileBasename $LogfileRetentionCount
 }
 else {
-    Invoke-Sync $configuration $ProgressHandler | Format-SyncLog
+   Invoke-Sync $configuration $ProgressHandler | Format-SyncLog
 }
