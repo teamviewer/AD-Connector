@@ -146,7 +146,6 @@ See file LICENSE
                                 <RowDefinition SharedSizeGroup="ConfigurationTabHeight" />
                             </Grid.RowDefinitions>
                             <StackPanel Margin="10">
-                                <CheckBox VerticalAlignment="Top" Margin="5" Content="{Binding L.EnableConditionalAccessSync}" IsChecked="{Binding ConfigurationData.EnableConditionalAccessSync}" />
                                 <CheckBox VerticalAlignment="Top" Margin="5" Content="{Binding L.EnableUserGroupsSync}" IsChecked="{Binding ConfigurationData.EnableUserGroupsSync}" />
                             </StackPanel>
                         </Grid>

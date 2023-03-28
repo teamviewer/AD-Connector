@@ -116,16 +116,6 @@ automatically asks for elevated rights (if required).
   user will also be taken into account when trying to map to a
   TeamViewer user.
 
-- Parameter `EnableConditionalAccessSync`:
-
-  If set to `true` the script attempts to synchronize the given AD groups and
-  their respective users with the directory groups for _conditional access_ in
-  TeamViewer. Those groups can then be used to restrict/allow TeamViewer
-  functionality for certain users.
-  The conditional access synchronization step runs after the user sync.
-  This option requires the API token to have additional permissions.
-  See point `ApiToken` above.
-
 - Parameter `EnableUserGroupsSync`:
 
   If set to `true` the script attempts to synchronize the given AD groups and
@@ -168,6 +158,10 @@ If configured, the secondary email addresses of AD users are also taken
 into account for the mapping between AD users and TeamViewer users.
 
 ## Changelog
+
+### [1.5.0]
+
+- Removed conditional access sync support.
 
 ### [1.4.1]
 

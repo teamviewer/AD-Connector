@@ -63,42 +63,6 @@ Describe 'Invoke-SyncPrework' {
             -ParameterFilter { $accessToken -eq 'TestApiToken' }
     }
 
-    It 'Should get all TeamViewer conditional access groups' {
-        Mock Get-TeamViewerConditionalAccessGroup { }
-        $configuration = @{ ApiToken = 'TestApiToken'; EnableConditionalAccessSync = $true }
-        $syncContext = @{ }
-        Invoke-SyncPrework $syncContext $configuration { }
-        Assert-MockCalled Get-TeamViewerConditionalAccessGroup -Times 1 -Scope It `
-            -ParameterFilter { $accessToken -eq 'TestApiToken' }
-    }
-
-    It 'Should get all TeamViewer conditional access group members' {
-        Mock Get-TeamViewerConditionalAccessGroup {
-            return @(
-                [pscustomobject]@{ id = 'ca123'; name = 'TestGroup1' },
-                [pscustomobject]@{ id = 'ca456'; name = 'TestGroup2' }
-            )
-        }
-        Mock Get-TeamViewerConditionalAccessGroupUser { }
-        $configuration = @{ ApiToken = 'TestApiToken'; EnableConditionalAccessSync = $true }
-        $syncContext = @{ }
-        Invoke-SyncPrework $syncContext $configuration { }
-        Assert-MockCalled Get-TeamViewerConditionalAccessGroup -Times 1 -Scope It `
-            -ParameterFilter { $accessToken -eq 'TestApiToken' }
-        Assert-MockCalled Get-TeamViewerConditionalAccessGroupUser -Times 1 -Scope It `
-            -ParameterFilter { $groupID -eq 'ca123' }
-        Assert-MockCalled Get-TeamViewerConditionalAccessGroupUser -Times 1 -Scope It `
-            -ParameterFilter { $groupID -eq 'ca456' }
-    }
-
-    It 'Should not handle TeamViewer conditional access groups if not configured' {
-        Mock Get-TeamViewerConditionalAccessGroup { }
-        $configuration = @{ ApiToken = 'TestApiToken'; EnableConditionalAccessSync = $false }
-        $syncContext = @{ }
-        Invoke-SyncPrework $syncContext $configuration { }
-        Assert-MockCalled Get-TeamViewerConditionalAccessGroup -Times 0 -Scope It
-    }
-
     Context 'Secondary Email Addresses' {
         It 'Should consider the secondary email of AD users if configured' {
             $testUserAd = @{
@@ -329,163 +293,6 @@ Describe 'Invoke-SyncUser' {
     }
 }
 
-Describe 'Invoke-SyncConditionalAccess' {
-    BeforeAll {
-        Mock Write-SyncLog { }
-        Mock Write-SyncProgress { }
-        Mock Select-ActiveDirectoryCommonName { return 'TestGroup' }
-        Mock Add-TeamViewerConditionalAccessGroupUser { }
-        Mock Add-TeamViewerConditionalAccessGroup {
-            return [pscustomobject]@{ name = 'TestGroup'; id = 'abc123' }
-        }
-        Mock Remove-TeamViewerConditionalAccessGroupUser { }
-    }
-
-    It 'Should create a conditional access group if not exists' {
-        $syncContext = @{
-            UsersActiveDirectoryByGroup   = @{ }
-            UsersConditionalAccessByGroup = @{ }
-            GroupsConditionalAccess       = @()
-        }
-        $configuration = @{
-            ActiveDirectoryGroups = @('CN=TestGroup')
-        }
-        Invoke-SyncConditionalAccess $syncContext $configuration { }
-        Assert-MockCalled Add-TeamViewerConditionalAccessGroup -Times 1 -Scope It `
-            -ParameterFilter { $groupName -Eq 'TestGroup' }
-    }
-
-    It 'Should add new users to the conditional access group' {
-        $syncContext = @{
-            UsersActiveDirectoryByGroup   = @{
-                'CN=TestGroup' = @(
-                    [pscustomobject]@{ Email = 'user1@example.test' }
-                )
-            }
-            UsersTeamViewerByEmail        = @{
-                'user1@example.test' = [pscustomobject]@{ id = 'u123' }
-            }
-            UsersConditionalAccessByGroup = @{
-                'ca123' = @()
-            }
-            GroupsConditionalAccess       = @(
-                [pscustomobject]@{ id = 'ca123'; name = 'TestGroup' }
-            )
-        }
-        $configuration = @{
-            ActiveDirectoryGroups = @('CN=TestGroup')
-        }
-        Invoke-SyncConditionalAccess $syncContext $configuration { }
-        Assert-MockCalled Add-TeamViewerConditionalAccessGroupUser -Times 1 -Scope It `
-            -ParameterFilter { $groupID -Eq 'ca123' -And $userIDs -Eq @('u123') }
-    }
-
-    It 'Should create bulks of 50 when adding new users to the conditional access group' {
-        $testTeamViewerUsers = @{}
-        foreach ($count in 1..120) {
-            $testTeamViewerUsers["user$count@example.test"] = [pscustomobject]@{ id = "u$count" }
-        }
-        $testTeamViewerUsers.Count | Should -Be 120
-        $syncContext = @{
-            UsersActiveDirectoryByGroup   = @{
-                'CN=TestGroup' = @(1..120 | ForEach-Object { [pscustomobject]@{ Email = "user$_@example.test" } })
-            }
-            UsersTeamViewerByEmail        = $testTeamViewerUsers
-            UsersConditionalAccessByGroup = @{
-                'ca123' = @()
-            }
-            GroupsConditionalAccess       = @(
-                [pscustomobject]@{ id = 'ca123'; name = 'TestGroup' }
-            )
-        }
-        $configuration = @{
-            ActiveDirectoryGroups = @('CN=TestGroup')
-        }
-        Invoke-SyncConditionalAccess $syncContext $configuration { }
-        Assert-MockCalled Add-TeamViewerConditionalAccessGroupUser -Times 3 -Scope It
-        Assert-MockCalled Add-TeamViewerConditionalAccessGroupUser -Times 2 -Scope It `
-            -ParameterFilter { $groupID -Eq 'ca123' -And $userIDs.Count -Eq 50 }
-        Assert-MockCalled Add-TeamViewerConditionalAccessGroupUser -Times 1 -Scope It `
-            -ParameterFilter { $groupID -Eq 'ca123' -And $userIDs.Count -Eq 20 }
-    }
-
-    It 'Should skip existing members of the conditional access group' {
-        $syncContext = @{
-            UsersActiveDirectoryByGroup   = @{
-                'CN=TestGroup' = @(
-                    [pscustomobject]@{ Email = 'user1@example.test' }
-                )
-            }
-            UsersTeamViewerByEmail        = @{
-                'user1@example.test' = [pscustomobject]@{ id = 'u123' }
-            }
-            UsersConditionalAccessByGroup = @{
-                'ca123' = @('u123')
-            }
-            GroupsConditionalAccess       = @(
-                [pscustomobject]@{ id = 'ca123'; name = 'TestGroup' }
-            )
-        }
-        $configuration = @{
-            ActiveDirectoryGroups = @('CN=TestGroup')
-        }
-        Invoke-SyncConditionalAccess $syncContext $configuration { }
-        Assert-MockCalled Add-TeamViewerConditionalAccessGroupUser -Times 0 -Scope It
-        Assert-MockCalled Remove-TeamViewerConditionalAccessGroupUser -Times 0 -Scope It
-    }
-
-    It 'Should remove unknown members from the conditional access group' {
-        $syncContext = @{
-            UsersActiveDirectoryByGroup   = @{
-                'CN=TestGroup' = @()
-            }
-            UsersTeamViewerByEmail        = @{
-                'user1@example.test' = [pscustomobject]@{ id = 'u123' }
-                'user2@example.test' = [pscustomobject]@{ id = 'u456' }
-            }
-            UsersConditionalAccessByGroup = @{
-                'ca123' = @('u123', 'u456')
-            }
-            GroupsConditionalAccess       = @(
-                [pscustomobject]@{ id = 'ca123'; name = 'TestGroup' }
-            )
-        }
-        $configuration = @{
-            ActiveDirectoryGroups = @('CN=TestGroup')
-        }
-        Invoke-SyncConditionalAccess $syncContext $configuration { }
-        Assert-MockCalled Remove-TeamViewerConditionalAccessGroupUser -Times 1 -Scope It `
-            -ParameterFilter {
-            $groupID -Eq 'ca123' -And $userIDs -And `
-                $userIDs.Contains('u123') -And $userIDs.Contains('u456')
-        }
-    }
-
-    It 'Should create bulks of 50 when removing members from the conditional access group' {
-        $syncContext = @{
-            UsersActiveDirectoryByGroup   = @{
-                'CN=TestGroup' = @()
-            }
-            UsersTeamViewerByEmail        = @{}
-            UsersConditionalAccessByGroup = @{
-                'ca123' = @(1..120 | ForEach-Object { "u@$_" })
-            }
-            GroupsConditionalAccess       = @(
-                [pscustomobject]@{ id = 'ca123'; name = 'TestGroup' }
-            )
-        }
-        $configuration = @{
-            ActiveDirectoryGroups = @('CN=TestGroup')
-        }
-        Invoke-SyncConditionalAccess $syncContext $configuration { }
-        Assert-MockCalled Remove-TeamViewerConditionalAccessGroupUser -Times 3 -Scope It
-        Assert-MockCalled Remove-TeamViewerConditionalAccessGroupUser -Times 2 -Scope It `
-            -ParameterFilter { $userIDs.Count -Eq 50 }
-        Assert-MockCalled Remove-TeamViewerConditionalAccessGroupUser -Times 1 -Scope It `
-            -ParameterFilter { $userIDs.Count -Eq 20 }
-    }
-}
-
 Describe 'Invoke-SyncUserGroups' {
     BeforeAll {
         Mock Write-SyncLog { }
@@ -651,7 +458,6 @@ Describe 'Invoke-Sync' {
     BeforeAll {
         Mock Invoke-SyncPrework { }
         Mock Invoke-SyncUser { }
-        Mock Invoke-SyncConditionalAccess { }
         Mock Invoke-SyncUserGroups { }
     }
 
@@ -659,15 +465,6 @@ Describe 'Invoke-Sync' {
         Invoke-Sync @{ } { }
         Assert-MockCalled Invoke-SyncPrework -Times 1 -Scope It
         Assert-MockCalled Invoke-SyncUser -Times 1 -Scope It
-        Assert-MockCalled Invoke-SyncConditionalAccess -Times 0 -Scope It
-        Assert-MockCalled Invoke-SyncUserGroups -Times 0 -Scope It
-    }
-
-    It 'Should call the conditional access sync operation if configured' {
-        Invoke-Sync @{EnableConditionalAccessSync = $true } { }
-        Assert-MockCalled Invoke-SyncPrework -Times 1 -Scope It
-        Assert-MockCalled Invoke-SyncUser -Times 1 -Scope It
-        Assert-MockCalled Invoke-SyncConditionalAccess -Times 1 -Scope It
         Assert-MockCalled Invoke-SyncUserGroups -Times 0 -Scope It
     }
 
@@ -675,7 +472,6 @@ Describe 'Invoke-Sync' {
         Invoke-Sync @{EnableUserGroupsSync = $true } { }
         Assert-MockCalled Invoke-SyncPrework -Times 1 -Scope It
         Assert-MockCalled Invoke-SyncUser -Times 1 -Scope It
-        Assert-MockCalled Invoke-SyncConditionalAccess -Times 0 -Scope It
         Assert-MockCalled Invoke-SyncUserGroups -Times 1 -Scope It
     }
 }

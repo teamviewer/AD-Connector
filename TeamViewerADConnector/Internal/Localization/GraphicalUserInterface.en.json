@@ -6,7 +6,6 @@
     "Apply": "Apply",
     "Cancel": "Cancel",
     "DeactivateUsers": "Deactivate TeamViewer users that are not member of the AD group",
-    "EnableConditionalAccessSync": "Enable TeamViewer Conditional Access group synchronization",
     "EnableUserGroupsSync": "Enable TeamViewer user groups synchronization",
     "FilterLogFiles": "Log files (*.log)|*.log|All files (*.*)|*.*",
     "Install": "Install",
