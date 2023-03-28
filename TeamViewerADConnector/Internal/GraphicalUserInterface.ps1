@@ -18,7 +18,9 @@ function Get-GraphicalUserInterfaceLocale([string] $culture = 'en') {
 
     $locale = $locales[$culture]
 
-    if (!$locale) { $locale = $locales.en }
+    if (!$locale) {
+        $locale = $locales.en 
+    }
 
     return $locale
 }
@@ -97,7 +99,12 @@ function Invoke-GraphicalUserInterfaceSync($configuration, [string] $culture, $o
     $handle = $cmd.BeginInvoke()
     $progressWindow.ShowDialog()
 
-    if ($context.StopHandle) { $cmd.EndStop($context.StopHandle) } else { $cmd.EndInvoke($handle) }
+    if ($context.StopHandle) {
+        $cmd.EndStop($context.StopHandle) 
+    }
+    else {
+        $cmd.EndInvoke($handle) 
+    }
 
     $runspace.Close()
 
@@ -196,15 +203,23 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
                     $textBox.Select($cursorPos, 0)
                 }
 
-                if ($adGroupsComboBox.SelectedItem) { $adGroupsComboBox.SelectedItem = $null }
+                if ($adGroupsComboBox.SelectedItem) {
+                    $adGroupsComboBox.SelectedItem = $null 
+                }
             }
-            elseif ($adGroupsComboBox.Items.Filter) { $adGroupsComboBox.Items.Filter = $null }
+            elseif ($adGroupsComboBox.Items.Filter) {
+                $adGroupsComboBox.Items.Filter = $null 
+            }
         })
 
     # Click Handler Button "Test Token"
     $mainWindow.FindName('BtnTestToken').Add_Click( {
-            try { $tokenValid = (Invoke-TeamViewerPing $mainWindow.DataContext.ConfigurationData.ApiToken) }
-            catch { Write-Error "Token test failed: $_" }
+            try {
+                $tokenValid = (Invoke-TeamViewerPing $mainWindow.DataContext.ConfigurationData.ApiToken) 
+            }
+            catch {
+                Write-Error "Token test failed: $_" 
+            }
 
             if ($tokenValid) {
                 [System.Windows.Forms.MessageBox]::Show(
@@ -298,7 +313,9 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
 
     # Click Handler Button "Uninstall" (Scheduled Task)
     $mainWindow.FindName('BtnUninstallSched').Add_Click( {
-            try { Uninstall-ScheduledSync }
+            try {
+                Uninstall-ScheduledSync 
+            }
             catch {
                 Write-Error "Failed to uninstall scheduled task: $_"
                 [System.Windows.Forms.MessageBox]::Show($locale.UninstallError, $locale.Title, [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)

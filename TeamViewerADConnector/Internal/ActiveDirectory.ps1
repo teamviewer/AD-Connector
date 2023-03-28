@@ -4,7 +4,9 @@
 function Get-ActiveDirectoryGroup($root) {
     $searcher = New-Object System.DirectoryServices.DirectorySearcher
 
-    if ($root) { $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root }
+    if ($root) {
+        $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root 
+    }
 
     $searcher.Filter = '(&(objectClass=group))'
     $searcher.SizeLimit = 2500
@@ -16,7 +18,9 @@ function Get-ActiveDirectoryGroup($root) {
 function Get-ActiveDirectoryGroupMember($root, $recursive, $path) {
     $searcher = New-Object System.DirectoryServices.DirectorySearcher
 
-    if ($root) { $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root }
+    if ($root) {
+        $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root 
+    }
 
     if ($recursive) {
         $searcher.Filter = "(&(objectClass=user)(memberOf:1.2.840.113556.1.4.1941:=$path))"

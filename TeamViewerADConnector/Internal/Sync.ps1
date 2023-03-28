@@ -20,7 +20,9 @@ function Format-SyncLog {
             "$($entry.Statistics | Format-Table -AutoSize -HideTableHeaders | Out-String)"
             "Duration $($entry.Activity): $($entry.Duration)"
         }
-        else { $_ }
+        else {
+            $_ 
+        }
     }
 }
 
@@ -37,8 +39,12 @@ function ConvertTo-SyncUpdateUserChangeset($userTV, $userAD) {
         return $changeset
     }
 
-    if ($userAD.name -ne $userTV.name) { $changeset.name = $userAD.name }
-    if ($userAD.IsEnabled -ne $userTV.active) { $changeset.active = $userAD.IsEnabled }
+    if ($userAD.name -ne $userTV.name) {
+        $changeset.name = $userAD.name 
+    }
+    if ($userAD.IsEnabled -ne $userTV.active) {
+        $changeset.active = $userAD.IsEnabled 
+    }
 
     return $changeset
 }
@@ -49,8 +55,12 @@ function Format-SyncUpdateUserChangeset {
     Process {
         $message = ''
 
-        if ($changeset.name) { $message += "Changing name to '$($changeset.name)'. " }
-        if ($changeset.active) { $message += "Changing account status to 'active'. " }
+        if ($changeset.name) {
+            $message += "Changing name to '$($changeset.name)'. " 
+        }
+        if ($changeset.active) {
+            $message += "Changing account status to 'active'. " 
+        }
 
         "$message"
     }
@@ -59,9 +69,19 @@ function Format-SyncUpdateUserChangeset {
 function Split-Bulk {
     param([int]$Size)
 
-    Begin { $bulk = New-Object System.Collections.ArrayList($Size) }
-    Process { $bulk.Add($_) | Out-Null; if ($bulk.Count -ge $Size) { , $bulk.Clone(); $bulk.Clear() } }
-    End { if ($bulk.Count -gt 0) { , $bulk } }
+    Begin {
+        $bulk = New-Object System.Collections.ArrayList($Size) 
+    }
+    Process {
+        $bulk.Add($_) | Out-Null; if ($bulk.Count -ge $Size) {
+            , $bulk.Clone(); $bulk.Clear() 
+        } 
+    }
+    End {
+        if ($bulk.Count -gt 0) {
+            , $bulk 
+        } 
+    }
 }
 
 function Resolve-TeamViewerAccount {
@@ -94,7 +114,9 @@ function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
         $adGroupUsers = @(Get-ActiveDirectoryGroupMember $configuration.ActiveDirectoryRoot $configuration.RecursiveGroups $adGroup)
         $usersADByGroup[$adGroup] = $adGroupUsers
 
-        if ($adGroupUsers) { $usersAD.AddRange($adGroupUsers) }
+        if ($adGroupUsers) {
+            $usersAD.AddRange($adGroupUsers) 
+        }
 
         ForEach ($adGroupUser in $adGroupUsers) {
             $usersADByEmail[$adGroupUser.Email] = $adGroupUser
@@ -191,7 +213,9 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                     $statistics.Failed++
                 }
             }
-            else { $statistics.Updated++ }
+            else {
+                $statistics.Updated++ 
+            }
         }
         else {
             Write-SyncLog "Creating user $($userAd.email)"
@@ -266,7 +290,9 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                     $statistics.Failed++
                 }
             }
-            else { $statistics.Deactivated++ }
+            else {
+                $statistics.Deactivated++ 
+            }
         }
     }
 
@@ -356,7 +382,9 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
                 }
             }
         }
-        else { $statistics.AddedMembers += $membersToAdd.Count }
+        else {
+            $statistics.AddedMembers += $membersToAdd.Count 
+        }
 
         # Remove unknown members from the user group
         $membersToRemove = @()
@@ -386,7 +414,9 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
                 }
             }
         }
-        else { $statistics.RemovedMembers += $membersToRemove.Count }
+        else {
+            $statistics.RemovedMembers += $membersToRemove.Count 
+        }
     }
 
     $stopwatch.Stop()
@@ -409,7 +439,9 @@ function Invoke-Sync($configuration, $progressHandler) {
         Write-SyncLog "Mode 'Test Run' is active!"
     }
 
-    if (!$progressHandler) { $progressHandler = { } }
+    if (!$progressHandler) {
+        $progressHandler = { } 
+    }
 
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 

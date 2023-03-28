@@ -8,8 +8,12 @@ function ConvertTo-TeamViewerRestError {
     param([parameter(ValueFromPipeline)]$err)
 
     Process {
-        try { return ($err | Out-String | ConvertFrom-Json) }
-        catch { return $err }
+        try {
+            return ($err | Out-String | ConvertFrom-Json) 
+        }
+        catch {
+            return $err 
+        }
     }
 }
 
@@ -22,7 +26,9 @@ function Invoke-TeamViewerRestMethod {
     if ($method -in 'Put', 'Delete') {
         # There is a known issue for PUT and DELETE operations to hang on Windows Server 2012.
         # Use `Invoke-WebRequest` for those type of methods.
-        try { return ((Invoke-WebRequest -UseBasicParsing @args).Content | ConvertFrom-Json) }
+        try {
+            return ((Invoke-WebRequest -UseBasicParsing @args).Content | ConvertFrom-Json) 
+        }
         catch [System.Net.WebException] {
             $stream = $_.Exception.Response.GetResponseStream()
             $reader = New-Object System.IO.StreamReader($stream)
@@ -32,8 +38,12 @@ function Invoke-TeamViewerRestMethod {
         }
     }
     else {
-        try { return Invoke-RestMethod -ErrorVariable restError @args }
-        catch { Throw ($restError | ConvertTo-TeamViewerRestError) }
+        try {
+            return Invoke-RestMethod -ErrorVariable restError @args 
+        }
+        catch {
+            Throw ($restError | ConvertTo-TeamViewerRestError) 
+        }
     }
 }
 
@@ -81,8 +91,14 @@ function Disable-TeamViewerUser($accessToken, $userId) {
 }
 
 function Get-TeamViewerAccount($accessToken, [switch] $NoThrow = $false) {
-    try { return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/account" -Method Get -Headers @{authorization = "Bearer $accessToken" } }
-    catch { if (!$NoThrow) { Throw } }
+    try {
+        return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/account" -Method Get -Headers @{authorization = "Bearer $accessToken" } 
+    }
+    catch {
+        if (!$NoThrow) {
+            Throw 
+        } 
+    }
 }
 
 function Get-TeamViewerConditionalAccessGroup($accessToken) {
