@@ -3,25 +3,19 @@
     "files.eol": "\r\n",
     "files.encoding": "utf8",
     "files.insertFinalNewline": true,
-    "files.trimTrailingWhitespace": true,
-
-	"editor.tabSize": 4,
-    "editor.insertSpaces": true,
-    "editor.formatOnPaste": true,
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true,
+    "editor.tabSize": 4,
 
     // https://en.wikipedia.org/wiki/Indentation_style#Styles
     "powershell.codeFormatting.autoCorrectAliases": true,
-    "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
-    "powershell.codeFormatting.preset": "Stroustrup",
-    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
-    "powershell.codeFormatting.useConstantStrings": true,
-    "powershell.codeFormatting.useCorrectCasing": true,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.preset": "Stroustrup",
+    "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
     "powershell.codeFormatting.ignoreOneLineBlock": false,
     "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
 
-	"cSpell.language": "en",
+    "cSpell.language": "en",
     "cSpell.caseSensitive": true
 }
