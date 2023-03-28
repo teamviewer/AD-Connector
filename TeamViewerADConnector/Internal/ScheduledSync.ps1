@@ -1,4 +1,4 @@
-# Copyright (c) 2018-2021 TeamViewer Germany GmbH
+# Copyright (c) 2018-2023 TeamViewer Germany GmbH
 # See file LICENSE
 
 $scheduledTaskPath = "\TeamViewer\"
