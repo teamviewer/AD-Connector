@@ -19,7 +19,7 @@ function Get-GraphicalUserInterfaceLocale([string] $culture = 'en') {
     $locale = $locales[$culture]
 
     if (!$locale) {
-        $locale = $locales.en 
+        $locale = $locales.en
     }
 
     return $locale
@@ -100,10 +100,10 @@ function Invoke-GraphicalUserInterfaceSync($configuration, [string] $culture, $o
     $progressWindow.ShowDialog()
 
     if ($context.StopHandle) {
-        $cmd.EndStop($context.StopHandle) 
+        $cmd.EndStop($context.StopHandle)
     }
     else {
-        $cmd.EndInvoke($handle) 
+        $cmd.EndInvoke($handle)
     }
 
     $runspace.Close()
@@ -204,21 +204,21 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
                 }
 
                 if ($adGroupsComboBox.SelectedItem) {
-                    $adGroupsComboBox.SelectedItem = $null 
+                    $adGroupsComboBox.SelectedItem = $null
                 }
             }
             elseif ($adGroupsComboBox.Items.Filter) {
-                $adGroupsComboBox.Items.Filter = $null 
+                $adGroupsComboBox.Items.Filter = $null
             }
         })
 
     # Click Handler Button "Test Token"
     $mainWindow.FindName('BtnTestToken').Add_Click( {
             try {
-                $tokenValid = (Invoke-TeamViewerPing $mainWindow.DataContext.ConfigurationData.ApiToken) 
+                $tokenValid = (Invoke-TeamViewerPing $mainWindow.DataContext.ConfigurationData.ApiToken)
             }
             catch {
-                Write-Error "Token test failed: $_" 
+                Write-Error "Token test failed: $_"
             }
 
             if ($tokenValid) {
@@ -314,7 +314,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     # Click Handler Button "Uninstall" (Scheduled Task)
     $mainWindow.FindName('BtnUninstallSched').Add_Click( {
             try {
-                Uninstall-ScheduledSync 
+                Uninstall-ScheduledSync
             }
             catch {
                 Write-Error "Failed to uninstall scheduled task: $_"

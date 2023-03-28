@@ -5,7 +5,7 @@ function Get-ActiveDirectoryGroup($root) {
     $searcher = New-Object System.DirectoryServices.DirectorySearcher
 
     if ($root) {
-        $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root 
+        $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root
     }
 
     $searcher.Filter = '(&(objectClass=group))'
@@ -19,7 +19,7 @@ function Get-ActiveDirectoryGroupMember($root, $recursive, $path) {
     $searcher = New-Object System.DirectoryServices.DirectorySearcher
 
     if ($root) {
-        $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root 
+        $searcher.SearchRoot = New-Object System.DirectoryServices.DirectoryEntry $root
     }
 
     if ($recursive) {
