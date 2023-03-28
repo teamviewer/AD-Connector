@@ -45,7 +45,7 @@ function Select-ActiveDirectoryCommonName {
     #  , + " \ < > ; \r \n = /
     # See https://msdn.microsoft.com/en-us/windows/desktop/aa366101
     # See https://www.ietf.org/rfc/rfc2253.txt
-    
+
     Process {
         if ($path -match 'CN=((?:[^,+"\\<>;\r\n=/]|(?:\\[,+"\\<>;\r\n=/]))+)') {
             return $Matches.1 -replace '\\([,+"\\<>;\r\n=/])', '$1'

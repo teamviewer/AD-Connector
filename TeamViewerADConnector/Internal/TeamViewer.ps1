@@ -114,7 +114,7 @@ function Get-TeamViewerConditionalAccessGroupUser($accessToken, $groupID) {
 
     Do {
         $payload = @{ }
-        
+
         if ($continuationToken) {
             $payload.continuation_token = $continuationToken
         }

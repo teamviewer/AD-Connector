@@ -305,7 +305,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
             }
 
             RefreshScheduledSyncData $mainWindow.DataContext.ScheduledSyncData
-            
+
             RefreshDataContext $mainWindow
         })
 

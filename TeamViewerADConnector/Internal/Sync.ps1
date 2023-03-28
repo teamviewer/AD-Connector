@@ -375,7 +375,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
         if (!$configuration.TestRun -And $membersToRemove.Count -Gt 0) {
             $membersToRemove | Split-Bulk -Size 100 | ForEach-Object {
                 $currentMembersToRemove = $_
-                
+
                 try {
                     (Remove-TeamViewerUserGroupMember $configuration.ApiToken $userGroup.id $currentMembersToRemove) | Out-Null
                     $statistics.RemovedMembers += $currentMembersToRemove.Count

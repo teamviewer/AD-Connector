@@ -51,7 +51,7 @@ function Confirm-Configuration($config) {
     if ($config.UseSsoCustomerId -And [string]::IsNullOrWhiteSpace($config.SsoCustomerId)) {
         Throw "The parameter 'SsoCustomerId' cannot be empty if 'UseSsoCustomerId' is configured."
     }
-    
+
     # Verify $config.MeetingLicenseKey is a valid guid
     ![string]::IsNullOrWhiteSpace($config.MeetingLicenseKey) -And [guid]$config.MeetingLicenseKey | Out-Null
 }
