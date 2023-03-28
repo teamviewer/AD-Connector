@@ -16,7 +16,6 @@ function Import-Configuration($filename) {
         DeactivateUsers             = $true
         RecursiveGroups             = $true
         UseSecondaryEmails          = $true
-        EnableConditionalAccessSync = $false
         EnableUserGroupsSync        = $false
         MeetingLicenseKey           = ''
     }
