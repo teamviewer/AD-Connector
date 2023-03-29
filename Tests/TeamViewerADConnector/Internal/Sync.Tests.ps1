@@ -16,24 +16,6 @@ BeforeAll {
     }
     function Get-TeamViewerAccount($accessToken, [switch]$NoThrow) {
     }
-    function Get-TeamViewerConditionalAccessGroup($accessToken) {
-    }
-    function Add-TeamViewerConditionalAccessGroup($accessToken, $groupName) {
-    }
-    function Get-TeamViewerConditionalAccessGroupUser($accessToken, $groupID) {
-    }
-    function Add-TeamViewerConditionalAccessGroupUser($accessToken, $groupID, $userIDs) {
-    }
-    function Remove-TeamViewerConditionalAccessGroupUser {
-        [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'accessToken', Justification = 'Needs to be mockable')]
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'groupID', Justification = 'Needs to be mockable')]
-        param($accessToken, $groupID, $userIDs)
-
-        if ($PSCmdlet.ShouldProcess($userIDs)) {
-        }
-    }
-
     function Get-TeamViewerUserGroup($accessToken) {
     }
     function Add-TeamViewerUserGroup($accessToken, $groupName) {

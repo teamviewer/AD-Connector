@@ -21,7 +21,7 @@ function Format-SyncLog {
             "Duration $($entry.Activity): $($entry.Duration)"
         }
         else {
-            $_ 
+            $_
         }
     }
 }
@@ -39,10 +39,10 @@ function ConvertTo-SyncUpdateUserChangeset($userTV, $userAD) {
         return $changeset
     }
     if ($userAD.name -ne $userTV.name) {
-        $changeset.name = $userAD.name 
+        $changeset.name = $userAD.name
     }
     if ($userAD.IsEnabled -ne $userTV.active) {
-        $changeset.active = $userAD.IsEnabled 
+        $changeset.active = $userAD.IsEnabled
     }
 
     return $changeset
@@ -55,10 +55,10 @@ function Format-SyncUpdateUserChangeset {
         $message = ''
 
         if ($changeset.name) {
-            $message += "Changing name to '$($changeset.name)'. " 
+            $message += "Changing name to '$($changeset.name)'. "
         }
         if ($changeset.active) {
-            $message += "Changing account status to 'active'. " 
+            $message += "Changing account status to 'active'. "
         }
 
         "$message"
@@ -69,17 +69,17 @@ function Split-Bulk {
     param([int]$Size)
 
     Begin {
-        $bulk = New-Object System.Collections.ArrayList($Size) 
+        $bulk = New-Object System.Collections.ArrayList($Size)
     }
     Process {
         $bulk.Add($_) | Out-Null; if ($bulk.Count -ge $Size) {
-            , $bulk.Clone(); $bulk.Clear() 
-        } 
+            , $bulk.Clone(); $bulk.Clear()
+        }
     }
     End {
         if ($bulk.Count -gt 0) {
-            , $bulk 
-        } 
+            , $bulk
+        }
     }
 }
 
@@ -112,7 +112,7 @@ function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
         $usersADByGroup[$adGroup] = $adGroupUsers
 
         if ($adGroupUsers) {
-            $usersAD.AddRange($adGroupUsers) 
+            $usersAD.AddRange($adGroupUsers)
         }
 
         ForEach ($adGroupUser in $adGroupUsers) {
@@ -162,8 +162,6 @@ function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
     $syncContext.UsersActiveDirectoryByEmail = $usersADByEmail
     $syncContext.UsersActiveDirectoryByGroup = $usersADByGroup
     $syncContext.UsersTeamViewerByEmail = $usersTVByEmail
-    $syncContext.GroupsConditionalAccess = $groupsCA
-    $syncContext.UsersConditionalAccessByGroup = $usersCAByGroup
     $syncContext.UserGroups = $userGroups
     $syncContext.UserGroupMembersByGroup = $userGroupMembersByGroup
 }
@@ -205,7 +203,7 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                 }
             }
             else {
-                $statistics.Updated++ 
+                $statistics.Updated++
             }
         }
         else {
@@ -218,15 +216,19 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                 if ($configuration.UseDefaultPassword) {
                     $newUser.password = $configuration.DefaultPassword
                 }
+
                 if ($configuration.UseGeneratedPassword) {
                     $newUser.password = ''
                 }
+
                 if ($configuration.UseSsoCustomerId) {
                     $newUser.sso_customer_id = $configuration.SsoCustomerId
                 }
+
                 if ($configuration.MeetingLicenseKey) {
                     $newUser.meeting_license_key = $configuration.MeetingLicenseKey
                 }
+
                 try {
                     $addedUser = (Add-TeamViewerUser $configuration.ApiToken $newUser)
                     $newUser.id = $addedUser.id
@@ -278,7 +280,7 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                 }
             }
             else {
-                $statistics.Deactivated++ 
+                $statistics.Deactivated++
             }
         }
     }
@@ -367,7 +369,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
             }
         }
         else {
-            $statistics.AddedMembers += $membersToAdd.Count 
+            $statistics.AddedMembers += $membersToAdd.Count
         }
 
         # Remove unknown members from the user group
@@ -397,7 +399,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
             }
         }
         else {
-            $statistics.RemovedMembers += $membersToRemove.Count 
+            $statistics.RemovedMembers += $membersToRemove.Count
         }
     }
 
@@ -422,7 +424,7 @@ function Invoke-Sync($configuration, $progressHandler) {
     }
 
     if (!$progressHandler) {
-        $progressHandler = { } 
+        $progressHandler = { }
     }
 
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
