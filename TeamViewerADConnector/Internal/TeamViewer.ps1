@@ -9,10 +9,10 @@ function ConvertTo-TeamViewerRestError {
 
     Process {
         try {
-            return ($err | Out-String | ConvertFrom-Json) 
+            return ($err | Out-String | ConvertFrom-Json)
         }
         catch {
-            return $err 
+            return $err
         }
     }
 }
@@ -27,7 +27,7 @@ function Invoke-TeamViewerRestMethod {
         # There is a known issue for PUT and DELETE operations to hang on Windows Server 2012.
         # Use `Invoke-WebRequest` for those type of methods.
         try {
-            return ((Invoke-WebRequest -UseBasicParsing @args).Content | ConvertFrom-Json) 
+            return ((Invoke-WebRequest -UseBasicParsing @args).Content | ConvertFrom-Json)
         }
         catch [System.Net.WebException] {
             $stream = $_.Exception.Response.GetResponseStream()
@@ -39,10 +39,10 @@ function Invoke-TeamViewerRestMethod {
     }
     else {
         try {
-            return Invoke-RestMethod -ErrorVariable restError @args 
+            return Invoke-RestMethod -ErrorVariable restError @args
         }
         catch {
-            Throw ($restError | ConvertTo-TeamViewerRestError) 
+            Throw ($restError | ConvertTo-TeamViewerRestError)
         }
     }
 }
@@ -91,78 +91,12 @@ function Disable-TeamViewerUser($accessToken, $userId) {
 
 function Get-TeamViewerAccount($accessToken, [switch] $NoThrow = $false) {
     try {
-        return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/account" -Method Get -Headers @{authorization = "Bearer $accessToken" } 
+        return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/account" -Method Get -Headers @{authorization = "Bearer $accessToken" }
     }
     catch {
         if (!$NoThrow) {
-            Throw 
-        } 
-    }
-}
-
-function Get-TeamViewerConditionalAccessGroup($accessToken) {
-    $continuationToken = $null
-
-    Do {
-        $payload = @{ }
-
-        if ($continuationToken) {
-            $payload.continuation_token = $continuationToken
+            Throw
         }
-
-        $response = Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/conditionalaccess/directorygroups" -Method Get -Headers @{authorization = "Bearer $accessToken" } -Body $payload
-
-        Write-Output $response.directory_groups
-        $continuationToken = $response.continuation_token
-    } While ($continuationToken)
-}
-
-function Add-TeamViewerConditionalAccessGroup($accessToken, $groupName) {
-    $payload = @{ name = $groupName }
-
-    return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/conditionalaccess/directorygroups" -Method Post -Headers @{authorization = "Bearer $accessToken" } `
-        -ContentType 'application/json; charset=utf-8' -Body ([System.Text.Encoding]::UTF8.GetBytes(($payload | ConvertTo-Json)))
-}
-
-function Get-TeamViewerConditionalAccessGroupUser($accessToken, $groupID) {
-    $continuationToken = $null
-
-    Do {
-        $payload = @{ }
-
-        if ($continuationToken) {
-            $payload.continuation_token = $continuationToken
-        }
-
-        $response = Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/conditionalaccess/directorygroups/$groupID/users" -Method Get -Headers @{authorization = "Bearer $accessToken" } -Body $payload
-
-        Write-Output $response.directory_group.user_ids
-        $continuationToken = $response.continuation_token
-    } While ($continuationToken)
-}
-
-function Add-TeamViewerConditionalAccessGroupUser($accessToken, $groupID, $userIDs) {
-    $payload = @{
-        member_type = 'User'
-        members     = @($userIDs)
-    }
-
-    return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/conditionalaccess/directorygroups/$groupID" -Method Post -Headers @{authorization = "Bearer $accessToken" } `
-        -ContentType 'application/json; charset=utf-8' -Body ([System.Text.Encoding]::UTF8.GetBytes(($payload | ConvertTo-Json)))
-}
-
-function Remove-TeamViewerConditionalAccessGroupUser {
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
-    param($accessToken, $groupID, $userIDs)
-
-    $payload = @{
-        member_type = 'User'
-        members     = @($userIDs)
-    }
-
-    if ($PSCmdlet.ShouldProcess($userIDs)) {
-        return Invoke-TeamViewerRestMethod -Uri "$tvApiBaseUrl/api/$tvApiVersion/conditionalaccess/directorygroups/$groupID/members" -Method Delete -Headers @{authorization = "Bearer $accessToken" } `
-            -ContentType 'application/json; charset=utf-8' -Body ([System.Text.Encoding]::UTF8.GetBytes(($payload | ConvertTo-Json)))
     }
 }
 
