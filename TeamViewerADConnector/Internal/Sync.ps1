@@ -3,6 +3,7 @@
 
 function Write-SyncLog {
     param([Parameter(ValueFromPipeline)] $message, [Parameter()] $Extra)
+
     Process {
         Write-Output -InputObject @{Date = (Get-Date); Message = $message; Extra = $Extra } -NoEnumerate
     }
@@ -11,57 +12,85 @@ function Write-SyncLog {
 function Format-SyncLog {
     Process {
         $entry = $_
+
         if ($entry -is [object] -And $entry -And $entry.Message) {
-            "$("{0:yyyy-MM-dd HH:mm:ss}" -f $entry.Date) $($entry.Message)"
+            "$('{0:yyyy-MM-dd HH:mm:ss}' -f $entry.Date) $($entry.Message)"
         }
         elseif ($entry -is [object] -And $entry -And $entry.Activity -And $entry.Statistics) {
             "$($entry.Statistics | Format-Table -AutoSize -HideTableHeaders | Out-String)"
             "Duration $($entry.Activity): $($entry.Duration)"
         }
-        else { $_ }
+        else {
+            $_ 
+        }
     }
 }
 
 function Write-SyncProgress {
     param($Handler, $PercentComplete, $CurrentOperation)
+
     (& $Handler $PercentComplete $CurrentOperation) | Out-Null
 }
 
 function ConvertTo-SyncUpdateUserChangeset($userTV, $userAD) {
     $changeset = @{ }
+
     if (!$userTV -Or !$userAD) {
         return $changeset
     }
-    if ($userAD.name -ne $userTV.name) { $changeset.name = $userAD.name }
-    if ($userAD.IsEnabled -ne $userTV.active) { $changeset.active = $userAD.IsEnabled }
+    if ($userAD.name -ne $userTV.name) {
+        $changeset.name = $userAD.name 
+    }
+    if ($userAD.IsEnabled -ne $userTV.active) {
+        $changeset.active = $userAD.IsEnabled 
+    }
+
     return $changeset
 }
 
 function Format-SyncUpdateUserChangeset {
     param([Parameter(ValueFromPipeline)] $changeset)
+
     Process {
-        $message = ""
-        if ($changeset.name) { $message += "Changing name to '$($changeset.name)'. " }
-        if ($changeset.active) { $message += "Changing account status to 'active'. " }
+        $message = ''
+
+        if ($changeset.name) {
+            $message += "Changing name to '$($changeset.name)'. " 
+        }
+        if ($changeset.active) {
+            $message += "Changing account status to 'active'. " 
+        }
+
         "$message"
     }
 }
 
 function Split-Bulk {
     param([int]$Size)
-    Begin { $bulk = New-Object System.Collections.ArrayList($Size) }
-    Process { $bulk.Add($_) | Out-Null; if ($bulk.Count -ge $Size) { , $bulk.Clone(); $bulk.Clear() } }
-    End { if ($bulk.Count -gt 0) { , $bulk } }
+
+    Begin {
+        $bulk = New-Object System.Collections.ArrayList($Size) 
+    }
+    Process {
+        $bulk.Add($_) | Out-Null; if ($bulk.Count -ge $Size) {
+            , $bulk.Clone(); $bulk.Clear() 
+        } 
+    }
+    End {
+        if ($bulk.Count -gt 0) {
+            , $bulk 
+        } 
+    }
 }
 
 function Resolve-TeamViewerAccount {
     param($syncContext, $configuration, [Parameter(ValueFromPipeline)] $userAd)
+
     Process {
         $userTv = $syncContext.UsersTeamViewerByEmail[$userAd.email]
+
         if (!$userTv -and $configuration.UseSecondaryEmails) {
-            $userTv = $userAd.SecondaryEmails | `
-                ForEach-Object { $syncContext.UsersTeamViewerByEmail[$_] } | `
-                Select-Object -First 1
+            $userTv = $userAd.SecondaryEmails | ForEach-Object { $syncContext.UsersTeamViewerByEmail[$_] } | Select-Object -First 1
         }
         Write-Output $userTv
     }
@@ -70,18 +99,25 @@ function Resolve-TeamViewerAccount {
 function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
     # Fetch users from configured AD groups.
     # Map the AD user objects to all their email addresses.
-    Write-SyncLog "Fetching members of configured Active Directory groups:"
+    Write-SyncLog 'Fetching members of configured Active Directory groups:'
     Write-SyncProgress -Handler $progressHandler -PercentComplete 5 -CurrentOperation 'GetActiveDirectoryGroupMembers'
+
     $usersAD = New-Object -TypeName System.Collections.Generic.List[System.Object]
     $usersADByEmail = @{ }
     $usersADByGroup = @{ }
+
     ForEach ($adGroup in $configuration.ActiveDirectoryGroups) {
         Write-SyncLog "Fetching members of Active Directory group '$adGroup'"
         $adGroupUsers = @(Get-ActiveDirectoryGroupMember $configuration.ActiveDirectoryRoot $configuration.RecursiveGroups $adGroup)
         $usersADByGroup[$adGroup] = $adGroupUsers
-        if ($adGroupUsers) { $usersAD.AddRange($adGroupUsers) }
+
+        if ($adGroupUsers) {
+            $usersAD.AddRange($adGroupUsers) 
+        }
+
         ForEach ($adGroupUser in $adGroupUsers) {
             $usersADByEmail[$adGroupUser.Email] = $adGroupUser
+
             if ($configuration.UseSecondaryEmails) {
                 $adGroupUser.SecondaryEmails | ForEach-Object { $usersADByEmail[$_] = $adGroupUser } | Out-Null
             }
@@ -91,27 +127,29 @@ function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
 
     # Filter only unique (email) AD users
     $usersAD = ($usersAD | Select-Object -Unique -Property `
-        @{ Label = "AsString"; Expression = { "$($_.Email)" }; }, `
-        @{ Label = "Value"; Expression = { $_ } } | Select-Object -ExpandProperty Value)
+        @{ Label = 'AsString'; Expression = { "$($_.Email)" }; }, `
+        @{ Label = 'Value'; Expression = { $_ } } | Select-Object -ExpandProperty Value)
     $adGroupsCount = ($configuration.ActiveDirectoryGroups | Measure-Object).Count
     Write-SyncLog "Retrieved $($usersAD.Count) unique users from $adGroupsCount configured Active Directory groups."
 
     # Fetch users from the configured TeamViewer company.
     # Users are mapped to their email addresses.
     Write-SyncProgress -Handler $progressHandler -PercentComplete 10 'GetTeamViewerUsers'
-    Write-SyncLog "Fetching TeamViewer company users"
+    Write-SyncLog 'Fetching TeamViewer company users'
+
     $usersTVByEmail = (Get-TeamViewerUser $configuration.ApiToken)
     Write-SyncLog "Retrieved $($usersTVByEmail.Count) TeamViewer company users"
 
     if ($configuration.EnableUserGroupsSync) {
         # Fetch all available user groups
         Write-SyncProgress -Handler $progressHandler -PercentComplete 20 'GetTeamViewerUserGroups'
-        Write-SyncLog "Fetching list of TeamViewer user groups."
+        Write-SyncLog 'Fetching list of TeamViewer user groups.'
         $userGroups = @(Get-TeamViewerUserGroup $configuration.ApiToken)
         Write-SyncLog "Retrieved $($userGroups.Count) TeamViewer user groups."
 
         # Fetch user group members
         $userGroupMembersByGroup = @{}
+
         foreach ($userGroup in $userGroups) {
             Write-SyncLog "Fetching members of TeamViewer user group '$($userGroup.name)'"
             $userGroupMembers = @(Get-TeamViewerUserGroupMember $configuration.ApiToken $userGroup.id)
@@ -131,7 +169,8 @@ function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
 }
 
 function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
-    Write-SyncLog "Starting Active Directory user synchronization."
+    Write-SyncLog 'Starting Active Directory user synchronization.'
+
     if ($configuration.TestRun) {
         Write-SyncLog "Mode 'Test Run' is active. Information of your TeamViewer account will not be modified!"
     }
@@ -143,6 +182,7 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
     Write-SyncProgress -Handler $progressHandler -PercentComplete 50 -CurrentOperation 'CreateUpdateUser'
     ForEach ($userAd in $syncContext.UsersActiveDirectory) {
         $userTv = $userAd | Resolve-TeamViewerAccount $syncContext $configuration
+
         if ($userTv -and $userTv.active -and $userTv.name -eq $userAd.name) {
             Write-SyncLog "No changes for user $($userAd.email). Skipping."
             $statistics.NotChanged++
@@ -150,9 +190,11 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
         elseif ($userTv) {
             $changeset = (ConvertTo-SyncUpdateUserChangeset $userTv $userAd)
             Write-SyncLog "Updating user $($userAd.email): $($changeset | Format-SyncUpdateUserChangeset)" -Extra $changeset
+
             if (!$configuration.TestRun) {
                 $updatedUser = $userAd.Clone()
                 $updatedUser.active = $true
+
                 try {
                     Edit-TeamViewerUser $configuration.ApiToken $userTv.id $updatedUser | Out-Null
                     $statistics.Updated++
@@ -162,24 +204,28 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                     $statistics.Failed++
                 }
             }
-            else { $statistics.Updated++ }
+            else {
+                $statistics.Updated++ 
+            }
         }
         else {
             Write-SyncLog "Creating user $($userAd.email)"
+
             if (!$configuration.TestRun) {
                 $newUser = $userAd.Clone()
                 $newUser.language = $configuration.UserLanguage
+
                 if ($configuration.UseDefaultPassword) {
                     $newUser.password = $configuration.DefaultPassword
                 }
                 if ($configuration.UseGeneratedPassword) {
-                    $newUser.password = ""
+                    $newUser.password = ''
                 }
                 if ($configuration.UseSsoCustomerId) {
-                    $newUser.sso_customer_id = $configuration.SsoCustomerId;
+                    $newUser.sso_customer_id = $configuration.SsoCustomerId
                 }
                 if ($configuration.MeetingLicenseKey) {
-                    $newUser.meeting_license_key = $configuration.MeetingLicenseKey;
+                    $newUser.meeting_license_key = $configuration.MeetingLicenseKey
                 }
                 try {
                     $addedUser = (Add-TeamViewerUser $configuration.ApiToken $newUser)
@@ -205,13 +251,15 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
         # Try to fetch the account information of the configured TeamViewer API token.
         # This information is used to not accidentially deactivate the token owner,
         # which would block further processing of the script.
-        Write-SyncLog "Trying to fetch account information of configured TeamViewer API token"
+        Write-SyncLog 'Trying to fetch account information of configured TeamViewer API token'
         $currentAccount = Get-TeamViewerAccount $configuration.ApiToken -NoThrow
+
         if (!$currentAccount) {
-            Write-SyncLog "Unable to determine token account information. Please check API token permissions."
+            Write-SyncLog 'Unable to determine token account information. Please check API token permissions.'
         }
 
         $usersUnknown = ($syncContext.UsersTeamViewerByEmail.Values | Where-Object { !$syncContext.UsersActiveDirectoryByEmail[$_.email] -And $_.active })
+
         ForEach ($user in $usersUnknown) {
             if ($currentAccount -And $currentAccount.email -eq $user.email) {
                 Write-SyncLog "Skipping deactivation of TeamViewer user $($user.email), because it owns the configured TeamViewer API token."
@@ -229,12 +277,14 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
                     $statistics.Failed++
                 }
             }
-            else { $statistics.Deactivated++ }
+            else {
+                $statistics.Deactivated++ 
+            }
         }
     }
 
     $stopwatch.Stop()
-    Write-SyncLog "Completed Active Directory user synchronization"
+    Write-SyncLog 'Completed Active Directory user synchronization'
 
     # Return some statistics
     Write-Output @{
@@ -245,7 +295,8 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
 }
 
 function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
-    Write-SyncLog "Starting user groups synchronization"
+    Write-SyncLog 'Starting user groups synchronization'
+
     if ($configuration.TestRun) {
         Write-SyncLog "Mode 'Test Run' is active. Information of your TeamViewer user groups will not be modified!"
     }
@@ -288,6 +339,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
         $membersToAdd = @()
         foreach ($userTv in $usersTv) {
             $userGroupMember = ($userGroupMembers | Where-Object { $_.accountId -Eq $userTv.id.Trim('u') })
+
             if (!$userGroupMember) {
                 Write-SyncLog "User '$($userTv.email)' will be added to user group '$($userGroup.name)'"
                 $membersToAdd += $userTv.id.Trim('u')
@@ -297,10 +349,13 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
                 $statistics.NotChanged++
             }
         }
+
         Write-SyncLog "Adding $($membersToAdd.Count) users to user group '$($userGroup.name)'"
+
         if (!$configuration.TestRun -And $membersToAdd.Count -Gt 0) {
             $membersToAdd | Split-Bulk -Size 100 | ForEach-Object {
                 $currentMembersToAdd = $_
+
                 try {
                     (Add-TeamViewerUserGroupMember $configuration.ApiToken $userGroup.id $currentMembersToAdd) | Out-Null
                     $statistics.AddedMembers += $currentMembersToAdd.Count
@@ -311,12 +366,16 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
                 }
             }
         }
-        else { $statistics.AddedMembers += $membersToAdd.Count }
+        else {
+            $statistics.AddedMembers += $membersToAdd.Count 
+        }
 
         # Remove unknown members from the user group
         $membersToRemove = @()
+
         foreach ($userGroupMember in $userGroupMembers) {
             $userTv = ($usersTv | Where-Object { $_.id.Trim('u') -Eq $userGroupMember.accountId })
+
             if (!$userTv) {
                 Write-SyncLog "User '$($userGroupMember.name)' will be removed from user group '$($userGroup.name)'"
                 $membersToRemove += $userGroupMember.accountId
@@ -326,6 +385,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
         if (!$configuration.TestRun -And $membersToRemove.Count -Gt 0) {
             $membersToRemove | Split-Bulk -Size 100 | ForEach-Object {
                 $currentMembersToRemove = $_
+
                 try {
                     (Remove-TeamViewerUserGroupMember $configuration.ApiToken $userGroup.id $currentMembersToRemove) | Out-Null
                     $statistics.RemovedMembers += $currentMembersToRemove.Count
@@ -336,11 +396,13 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
                 }
             }
         }
-        else { $statistics.RemovedMembers += $membersToRemove.Count }
+        else {
+            $statistics.RemovedMembers += $membersToRemove.Count 
+        }
     }
 
     $stopwatch.Stop()
-    Write-SyncLog "Completed TeamViewer user group synchronization"
+    Write-SyncLog 'Completed TeamViewer user group synchronization'
 
     # Return some statistics
     Write-Output @{
@@ -351,21 +413,25 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
 }
 
 function Invoke-Sync($configuration, $progressHandler) {
-    Write-SyncLog ("-" * 50)
-    Write-SyncLog "Starting synchronization run"
+    Write-SyncLog ('-' * 50)
+    Write-SyncLog 'Starting synchronization run'
     Write-SyncLog "Version $ScriptVersion ($([environment]::OSVersion.VersionString), PS $($PSVersionTable.PSVersion))"
 
     if ($configuration.TestRun) {
         Write-SyncLog "Mode 'Test Run' is active!"
     }
 
-    if (!$progressHandler) { $progressHandler = { } }
+    if (!$progressHandler) {
+        $progressHandler = { } 
+    }
 
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     $syncContext = @{ }
+
     Invoke-SyncPrework -syncContext $syncContext -configuration $configuration -progressHandler $progressHandler
     Invoke-SyncUser -syncContext $syncContext -configuration $configuration -progressHandler $progressHandler
+
     if ($configuration.EnableUserGroupsSync) {
         Invoke-SyncUserGroups -syncContext $syncContext -configuration $configuration -progressHandler $progressHandler
     }
