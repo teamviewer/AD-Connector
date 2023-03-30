@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 # Controls when the workflow will run
@@ -18,28 +16,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
       - uses: actions/checkout@v2
 
-      # Print versions
+      # Print Powershell version
       - name: Powershell Environment
         shell: pwsh
         run: |
           $PSVersionTable
-      # Run tests
-      - name: Run Pester
-        shell: pwsh
-        run: |
-          $ProgressPreference='SilentlyContinue'
-          Install-Module Pester -Force -SkipPublisherCheck -Scope CurrentUser `
-            -RequiredVersion 5.1.1 -Verbose
-          Invoke-Pester $env:GITHUB_WORKSPACE -Output Detailed -CI
       # Run linter
-      - name: Run Script Analyzer
+      - name: Run linter (via PSScriptAnalyzer)
         shell: pwsh
         run: |
-          $ProgressPreference='SilentlyContinue'
-          $ErrorActionPreference='Stop'
-          Install-Module PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser `
-            -RequiredVersion 1.19.1 -Verbose
+          $ProgressPreference = 'SilentlyContinue'
+          $ErrorActionPreference = 'Stop'
+          Install-Module PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser -RequiredVersion 1.19.1 -Verbose
           Invoke-ScriptAnalyzer -Path $env:GITHUB_WORKSPACE -Recurse -ReportSummary -EnableExit -ExcludeRule PSReviewUnusedParameter
+      # Run tests
+      - name: Run tests (via Pester)
+        shell: pwsh
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser -RequiredVersion 5.1.1 -Verbose
+          Invoke-Pester -Path $env:GITHUB_WORKSPACE -Output Detailed -CI
