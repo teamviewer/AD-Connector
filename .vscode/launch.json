@@ -1,7 +1,5 @@
 {
-    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
-    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
-    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+    // See https://go.microsoft.com/fwlink/?linkid=830387 for the documentation about the launch.json format
     "version": "0.2.0",
     "configurations": [
         {
