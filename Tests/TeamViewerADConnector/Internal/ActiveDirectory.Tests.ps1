@@ -8,7 +8,7 @@ BeforeAll {
 Describe 'Get-ActiveDirectoryGroup' {
 
     It 'Should create and call a DirectorySearcher' {
-        $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
+        $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name 'FindAll' -Value {
             return @(
                 ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://TestPath3' } -PassThru),
                 ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://TestPath1' } -PassThru),
@@ -24,7 +24,7 @@ Describe 'Get-ActiveDirectoryGroup' {
     }
 
     It 'Should set the optional search root' {
-        $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
+        $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name 'FindAll' -Value {
             return @()
         }
 
@@ -41,7 +41,7 @@ Describe 'Get-ActiveDirectoryGroup' {
     }
 
     It 'Should handle servernames in the LDAP path' {
-        $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
+        $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name 'FindAll' -Value {
             return @(
                 ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://server1/TestPath1' } -PassThru),
                 ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://some.server2.test/TestPath2' } -PassThru),
@@ -73,11 +73,11 @@ Describe 'Get-ActiveDirectoryGroupMember' {
     It 'Should return a list of active AD users' {
         $mockedDirectorySearcher = @{
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
-        } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
+        } | Add-Member -PassThru -MemberType ScriptMethod -Name 'FindAll' -Value {
             return @(
-                (Add-TestUser -mail 'user3@example.test' -name 'User 3' -uac 1)
-                (Add-TestUser -mail 'user1@example.test' -name 'User 1' -uac 1)
-                (Add-TestUser -mail 'user2@example.test' -name 'User 2' -uac 1)
+                (Add-TestUser -mail 'user3@example.test' -Name 'User 3' -uac 1)
+                (Add-TestUser -mail 'user1@example.test' -Name 'User 1' -uac 1)
+                (Add-TestUser -mail 'user2@example.test' -Name 'User 2' -uac 1)
             )
         }
 
@@ -95,10 +95,10 @@ Describe 'Get-ActiveDirectoryGroupMember' {
     It 'Should ignore inactive AD users' {
         $mockedDirectorySearcher = @{
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
-        } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
+        } | Add-Member -PassThru -MemberType ScriptMethod -Name 'FindAll' -Value {
             return @(
-                (Add-TestUser -mail 'active@example.test' -name 'Active User' -uac 1)
-                (Add-TestUser -mail 'inactive@example.test' -name 'Inactive User' -uac 2)
+                (Add-TestUser -mail 'active@example.test' -Name 'Active User' -uac 1)
+                (Add-TestUser -mail 'inactive@example.test' -Name 'Inactive User' -uac 2)
             )
         }
 
@@ -112,9 +112,9 @@ Describe 'Get-ActiveDirectoryGroupMember' {
     It 'Should parse secondary email addresses' {
         $mockedDirectorySearcher = @{
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
-        } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
+        } | Add-Member -PassThru -MemberType ScriptMethod -Name 'FindAll' -Value {
             return @(
-                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 -proxyaddr 'smtp:secondary@example.test')
+                (Add-TestUser -mail 'primary@example.test' -Name 'Test User' -uac 1 -proxyaddr 'smtp:secondary@example.test')
             )
         }
 
@@ -129,9 +129,9 @@ Describe 'Get-ActiveDirectoryGroupMember' {
     It 'Should ignore trailing whitespace in secondary email addresses' {
         $mockedDirectorySearcher = @{
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
-        } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
+        } | Add-Member -PassThru -MemberType ScriptMethod -Name 'FindAll' -Value {
             return @(
-                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 -proxyaddr 'smtp:secondary@example.test  ')
+                (Add-TestUser -mail 'primary@example.test' -Name 'Test User' -uac 1 -proxyaddr 'smtp:secondary@example.test  ')
             )
         }
 
