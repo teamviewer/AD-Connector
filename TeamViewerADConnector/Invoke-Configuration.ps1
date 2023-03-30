@@ -5,8 +5,7 @@
  .DESCRIPTION
     This script will start the graphical user interface to configure the TeamViewer AD Connector script.
     It allows to update the configuration and store it to the configuration file.
-    Also it is possible to trigger a run of the TeamViewer AD Connector synchronization script from
-    within the graphical user interface.
+    Also it is possible to trigger a run of the TeamViewer AD Connector synchronization script from within the graphical user interface.
     In addition, this script allows to setup a scheduled task to run TeamViewer AD Connector regularly.
 
  .PARAMETER ConfigurationFile
@@ -24,6 +23,7 @@
  .NOTES
     Copyright (c) 2018-2023 TeamViewer Germany GmbH
     See file LICENSE
+
     Version {ScriptVersion}
 #>
 
@@ -46,8 +46,9 @@ if ($Version) {
 }
 
 $principal = (New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent()))
+
 if (!$principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
-   Start-Process powershell -Verb runAs -ArgumentList "& '$($script:MyInvocation.MyCommand.Definition)'"
+   Start-Process Powershell -Verb runAs -ArgumentList "& '$($script:MyInvocation.MyCommand.Definition)'"
    exit 0
 }
 
@@ -58,4 +59,5 @@ if (!$principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Adminis
 (. "$PSScriptRoot\Internal\GraphicalUserInterface.ps1")
 
 $configuration = (Import-Configuration $ConfigurationFile)
+
 Invoke-GraphicalUserInterfaceConfiguration $configuration $Culture

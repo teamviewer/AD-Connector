@@ -2,35 +2,36 @@
 # See file LICENSE
 
 BeforeAll {
-    function Get-ActiveDirectoryGroupMember($root, $recursive, $path) { }
-    function Select-ActiveDirectoryCommonName { }
-    function Get-TeamViewerUser($accessToken) { }
-    function Add-TeamViewerUser($accessToken, $user) { }
-    function Edit-TeamViewerUser($accessToken, $userId, $user) { }
-    function Disable-TeamViewerUser($accessToken, $userId) { }
-    function Get-TeamViewerAccount($accessToken, [switch]$NoThrow) { }
-    function Get-TeamViewerConditionalAccessGroup($accessToken) { }
-    function Add-TeamViewerConditionalAccessGroup($accessToken, $groupName) { }
-    function Get-TeamViewerConditionalAccessGroupUser($accessToken, $groupID) { }
-    function Add-TeamViewerConditionalAccessGroupUser($accessToken, $groupID, $userIDs) { }
-    function Remove-TeamViewerConditionalAccessGroupUser {
-        [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'accessToken', Justification = 'Needs to be mockable')]
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'groupID', Justification = 'Needs to be mockable')]
-        param($accessToken, $groupID, $userIDs)
-        if ($PSCmdlet.ShouldProcess($userIDs)) { }
+    function Get-ActiveDirectoryGroupMember($root, $recursive, $path) {
     }
-
-    function Get-TeamViewerUserGroup($accessToken) { }
-    function Add-TeamViewerUserGroup($accessToken, $groupName) { }
-    function Get-TeamViewerUserGroupMember($accessToken, $groupID) { }
-    function Add-TeamViewerUserGroupMember($accessToken, $groupID, $accountIDs) { }
+    function Select-ActiveDirectoryCommonName {
+    }
+    function Get-TeamViewerUser($accessToken) {
+    }
+    function Add-TeamViewerUser($accessToken, $user) {
+    }
+    function Edit-TeamViewerUser($accessToken, $userId, $user) {
+    }
+    function Disable-TeamViewerUser($accessToken, $userId) {
+    }
+    function Get-TeamViewerAccount($accessToken, [switch]$NoThrow) {
+    }
+    function Get-TeamViewerUserGroup($accessToken) {
+    }
+    function Add-TeamViewerUserGroup($accessToken, $groupName) {
+    }
+    function Get-TeamViewerUserGroupMember($accessToken, $groupID) {
+    }
+    function Add-TeamViewerUserGroupMember($accessToken, $groupID, $accountIDs) {
+    }
     function Remove-TeamViewerUserGroupMember {
         [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'accessToken', Justification = 'Needs to be mockable')]
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'groupID', Justification = 'Needs to be mockable')]
         param($accessToken, $groupID, $accountIDs)
-        if ($PSCmdlet.ShouldProcess($accountIDs)) { }
+
+        if ($PSCmdlet.ShouldProcess($accountIDs)) {
+        }
     }
 
     . "$PSScriptRoot\..\..\..\TeamViewerADConnector\Internal\Sync.ps1"
@@ -43,24 +44,26 @@ Describe 'Invoke-SyncPrework' {
 
     It 'Should get all configured AD groups' {
         Mock Get-ActiveDirectoryGroupMember { }
+
         $configuration = @{ ActiveDirectoryGroups = @('Group1', 'Group2', 'Group3') }
         $syncContext = @{ }
+
         Invoke-SyncPrework $syncContext $configuration { }
-        Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It `
-            -ParameterFilter { $path -eq 'Group1' }
-        Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It `
-            -ParameterFilter { $path -eq 'Group2' }
-        Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It `
-            -ParameterFilter { $path -eq 'Group3' }
+
+        Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It -ParameterFilter { $path -eq 'Group1' }
+        Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It -ParameterFilter { $path -eq 'Group2' }
+        Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It -ParameterFilter { $path -eq 'Group3' }
     }
 
     It 'Should get all TeamViewer company members' {
         Mock Get-TeamViewerUser { }
+
         $configuration = @{ ApiToken = 'TestApiToken' }
         $syncContext = @{ }
+
         Invoke-SyncPrework $syncContext $configuration { }
-        Assert-MockCalled Get-TeamViewerUser -Times 1 -Scope It `
-            -ParameterFilter { $accessToken -eq 'TestApiToken' }
+
+        Assert-MockCalled Get-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $accessToken -eq 'TestApiToken' }
     }
 
     Context 'Secondary Email Addresses' {
@@ -71,12 +74,16 @@ Describe 'Invoke-SyncPrework' {
                 IsEnabled       = $true
                 SecondaryEmails = @('user1_secondary@example.test')
             }
+
             Mock Get-ActiveDirectoryGroupMember { return @($testUserAd) }
+
             $configuration = @{ ActiveDirectoryGroups = @('Group1'); UseSecondaryEmails = $true }
             $syncContext = @{ }
+
             Invoke-SyncPrework $syncContext $configuration { }
-            Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It `
-                -ParameterFilter { $path -eq 'Group1' }
+
+            Assert-MockCalled Get-ActiveDirectoryGroupMember -Times 1 -Scope It -ParameterFilter { $path -eq 'Group1' }
+
             $syncContext.UsersActiveDirectoryByEmail | Should -Not -BeNull
             $syncContext.UsersActiveDirectoryByEmail.Keys | Should -Contain 'user1@example.test'
             $syncContext.UsersActiveDirectoryByEmail.Keys | Should -Contain 'user1_secondary@example.test'
@@ -101,13 +108,15 @@ Describe 'Invoke-SyncUser' {
                 'user1@example.test' = @{ email = 'user1@example.test'; name = 'Test User 1'; active = $true }
             }
         }
+
         Invoke-SyncUser $syncContext $configuration { }
-        Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
-            -ParameterFilter { $user -And $user.email -eq 'user2@example.test' }
+
+        Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $user -And $user.email -eq 'user2@example.test' }
     }
 
     It 'Should update existing TeamViewer users from AD groups members' {
         Mock Edit-TeamViewerUser { }
+
         $syncContext = @{
             UsersActiveDirectory   = @(
                 @{ Email = 'user1@example.test'; Name = 'New Name'; IsEnabled = $true }
@@ -116,14 +125,17 @@ Describe 'Invoke-SyncUser' {
                 'user1@example.test' = @{ id = '123'; email = 'user1@example.test'; name = 'Old Name'; active = $true }
             }
         }
+
         $configuration = @{ ActiveDirectoryGroups = @('Group1') }
+
         Invoke-SyncUser $syncContext $configuration { }
-        Assert-MockCalled Edit-TeamViewerUser -Times 1 -Scope It `
-            -ParameterFilter { $user -And $user.Name -eq 'New Name' -And $userId -eq 123 }
+
+        Assert-MockCalled Edit-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $user -And $user.Name -eq 'New Name' -And $userId -eq 123 }
     }
 
     It 'Should deactivate unknown TeamViewer users' {
         Mock Disable-TeamViewerUser { }
+
         $syncContext = @{
             UsersActiveDirectory        = @(
                 @{ Email = 'user2@example.test'; Name = 'User 2'; IsEnabled = $true }
@@ -136,16 +148,22 @@ Describe 'Invoke-SyncUser' {
                 'user2@example.test' = @{ id = '456'; email = 'user2@example.test'; name = 'User 2'; active = $true }
             }
         }
+
         $configuration = @{ ActiveDirectoryGroups = @('Group1'); DeactivateUsers = $true }
+
         Invoke-SyncUser $syncContext $configuration { }
+
         Assert-MockCalled Disable-TeamViewerUser -Times 1 -ParameterFilter { $userId -eq 123 }
     }
 
     It 'Should not deactivate the token account' {
+
         Mock Get-TeamViewerAccount {
             return @{ userid = '123'; email = 'user1@example.test'; name = 'User 1' }
         }
+
         Mock Disable-TeamViewerUser { }
+
         $syncContext = @{
             UsersActiveDirectory        = @()
             UsersActiveDirectoryByEmail = @{ }
@@ -153,8 +171,11 @@ Describe 'Invoke-SyncUser' {
                 'user1@example.test' = @{ id = '123'; email = 'user1@example.test'; name = 'User 1'; active = $true }
             }
         }
+
         $configuration = @{ ActiveDirectoryGroups = @('Group1'); DeactivateUsers = $true }
+
         Invoke-SyncUser $syncContext $configuration { }
+
         Assert-MockCalled Get-TeamViewerAccount -Times 1 -Scope It
         Assert-MockCalled Disable-TeamViewerUser -Times 0 -Scope It
     }
@@ -170,13 +191,16 @@ Describe 'Invoke-SyncUser' {
                 DefaultPassword       = 'testpassword'
                 ActiveDirectoryGroups = @('Group1')
             }
+
             $syncContext = @{
                 UsersActiveDirectory   = @(@{ Email = 'user1@example.test'; Name = 'Test User 1'; IsEnabled = $true })
                 UsersTeamViewerByEmail = @{ }
             }
+
             Invoke-SyncUser $syncContext $configuration { }
-            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
-                -ParameterFilter { $user -And $user.password -eq 'testpassword' }
+
+            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $user -And $user.password -eq 'testpassword' }
+
             $syncContext.UsersTeamViewerByEmail['user1@example.test'] | Should -Not -BeNullOrEmpty
         }
 
@@ -185,13 +209,16 @@ Describe 'Invoke-SyncUser' {
                 UseGeneratedPassword  = $true
                 ActiveDirectoryGroups = @('Group1')
             }
+
             $syncContext = @{
                 UsersActiveDirectory   = @(@{ Email = 'user1@example.test'; Name = 'Test User 1'; IsEnabled = $true })
                 UsersTeamViewerByEmail = @{ }
             }
+
             Invoke-SyncUser $syncContext $configuration { }
-            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
-                -ParameterFilter { $user -And $user.password -eq '' }
+
+            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $user -And $user.password -eq '' }
+
             $syncContext.UsersTeamViewerByEmail['user1@example.test'] | Should -Not -BeNullOrEmpty
         }
 
@@ -201,13 +228,16 @@ Describe 'Invoke-SyncUser' {
                 SsoCustomerId         = 'testcustomeridentifier'
                 ActiveDirectoryGroups = @('Group1')
             }
+
             $syncContext = @{
                 UsersActiveDirectory   = @(@{ Email = 'user1@example.test'; Name = 'Test User 1'; IsEnabled = $true })
                 UsersTeamViewerByEmail = @{ }
             }
+
             Invoke-SyncUser $syncContext $configuration { }
-            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
-                -ParameterFilter { $user -And $user.sso_customer_id -eq 'testcustomeridentifier' }
+
+            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $user -And $user.sso_customer_id -eq 'testcustomeridentifier' }
+
             $syncContext.UsersTeamViewerByEmail['user1@example.test'] | Should -Not -BeNullOrEmpty
         }
     }
@@ -234,17 +264,18 @@ Describe 'Invoke-SyncUser' {
             Mock Add-TeamViewerUser { }
 
             Invoke-SyncUser $syncContext $configuration { }
-            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
-                -ParameterFilter { $user -And $user.meeting_license_key -eq $configuration.MeetingLicenseKey }
+
+            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $user -And $user.meeting_license_key -eq $configuration.MeetingLicenseKey }
         }
 
         It 'Should not be set non-existent meeting license on new user passed to Add-TeamViewerUser' {
             Mock Add-TeamViewerUser { }
+
             $configuration.Remove('MeetingLicenseKey')
 
             Invoke-SyncUser $syncContext $configuration { }
-            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It `
-                -ParameterFilter { $user -And -Not $user.meeting_license_key }
+
+            Assert-MockCalled Add-TeamViewerUser -Times 1 -Scope It -ParameterFilter { $user -And -Not $user.meeting_license_key }
         }
     }
 
@@ -263,9 +294,9 @@ Describe 'Invoke-SyncUser' {
                 SecondaryEmails = @('user1_secondary@example.test')
             }
             $testUserTv = @{
-                id     = '123';
-                email  = 'user1_secondary@example.test';
-                name   = 'User 1';
+                id     = '123'
+                email  = 'user1_secondary@example.test'
+                name   = 'User 1'
                 active = $true
             }
             $syncContext = @{
@@ -284,7 +315,9 @@ Describe 'Invoke-SyncUser' {
                 DeactivateUsers       = $true
                 ActiveDirectoryGroups = @('Group1')
             }
+
             Invoke-SyncUser $syncContext $configuration { }
+
             # Users are the same, so no add/update/disable
             Assert-MockCalled Add-TeamViewerUser -Times 0 -Scope It
             Assert-MockCalled Edit-TeamViewerUser -Times 0 -Scope It
@@ -316,8 +349,8 @@ Describe 'Invoke-SyncUserGroups' {
         }
         $result = Invoke-SyncUserGroups $testSyncContext $testConfiguration {}
         $result.Statistics.CreatedGroups | Should -Be 1
-        Assert-MockCalled Add-TeamViewerUserGroup -Times 1 -Scope It `
-            -ParameterFilter { $groupName -Eq 'TestGroup' }
+
+        Assert-MockCalled Add-TeamViewerUserGroup -Times 1 -Scope It -ParameterFilter { $groupName -Eq 'TestGroup' }
     }
 
     It 'Should add users to the user group' {
@@ -342,15 +375,17 @@ Describe 'Invoke-SyncUserGroups' {
         }
         $result = Invoke-SyncUserGroups $testSyncContext $testConfiguration {}
         $result.Statistics.AddedMembers | Should -Be 1
-        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 1 -Scope It `
-            -ParameterFilter { $groupID -Eq 11223344 }
+
+        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 1 -Scope It -ParameterFilter { $groupID -Eq 11223344 }
     }
 
     It 'Should create bulks of 100 when adding new members to a user group' {
         $testTeamViewerUsers = @{}
+
         foreach ($count in 1..220) {
             $testTeamViewerUsers["user$count@example.test"] = [pscustomobject]@{ id = "u$count" }
         }
+
         $testTeamViewerUsers.Count | Should -Be 220
         $testSyncContext = @{
             UsersActiveDirectoryByGroup = @{
@@ -369,12 +404,10 @@ Describe 'Invoke-SyncUserGroups' {
         }
         $result = Invoke-SyncUserGroups $testSyncContext $testConfiguration {}
         $result.Statistics.AddedMembers | Should -Be 220
-        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 3 -Scope It `
-            -ParameterFilter { $groupID -Eq 11223344 }
-        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 2 -Scope It `
-            -ParameterFilter { $groupID -Eq 11223344 -And $accountIDs.Count -Eq 100 }
-        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 1 -Scope It `
-            -ParameterFilter { $groupID -Eq 11223344 -And $accountIDs.Count -Eq 20 }
+
+        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 3 -Scope It -ParameterFilter { $groupID -Eq 11223344 }
+        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 2 -Scope It -ParameterFilter { $groupID -Eq 11223344 -And $accountIDs.Count -Eq 100 }
+        Assert-MockCalled Add-TeamViewerUserGroupMember -Times 1 -Scope It -ParameterFilter { $groupID -Eq 11223344 -And $accountIDs.Count -Eq 20 }
     }
 
     It 'Should skip existing members of the user group' {
@@ -401,6 +434,7 @@ Describe 'Invoke-SyncUserGroups' {
         $result.Statistics.NotChanged | Should -Be 1
         $result.Statistics.AddedMembers | Should -Be 0
         $result.Statistics.RemovedMembers | Should -Be 0
+
         Assert-MockCalled Add-TeamViewerUserGroupMember -Times 0 -Scope It
         Assert-MockCalled Remove-TeamViewerUserGroupMember -Times 0 -Scope It
     }
@@ -423,12 +457,12 @@ Describe 'Invoke-SyncUserGroups' {
         }
         $result = Invoke-SyncUserGroups $testSyncContext $testConfiguration {}
         $result.Statistics.RemovedMembers | Should -Be 1
-        Assert-MockCalled Remove-TeamViewerUserGroupMember -Times 1 -Scope It `
-            -ParameterFilter { $groupID -Eq 11223344 -And $accountIDs.Contains(123) }
+
+        Assert-MockCalled Remove-TeamViewerUserGroupMember -Times 1 -Scope It -ParameterFilter { $groupID -Eq 11223344 -And $accountIDs.Contains(123) }
     }
 
     It 'Should create bulks of 100 when removing members from a user group' {
-        $testUserGroupMembers = (1..220 | ForEach-Object {  [pscustomobject]@{ accountId = $_ } })
+        $testUserGroupMembers = (1..220 | ForEach-Object { [pscustomobject]@{ accountId = $_ } })
         $testUserGroupMembers.Count | Should -Be 220
         $testSyncContext = @{
             UsersActiveDirectoryByGroup = @{}
@@ -445,6 +479,7 @@ Describe 'Invoke-SyncUserGroups' {
         }
         $result = Invoke-SyncUserGroups $testSyncContext $testConfiguration {}
         $result.Statistics.RemovedMembers | Should -Be 220
+
         Assert-MockCalled Remove-TeamViewerUserGroupMember -Times 3 -Scope It `
             -ParameterFilter { $groupID -Eq 11223344 }
         Assert-MockCalled Remove-TeamViewerUserGroupMember -Times 2 -Scope It `
@@ -463,6 +498,7 @@ Describe 'Invoke-Sync' {
 
     It 'Should call the user sync operations' {
         Invoke-Sync @{ } { }
+
         Assert-MockCalled Invoke-SyncPrework -Times 1 -Scope It
         Assert-MockCalled Invoke-SyncUser -Times 1 -Scope It
         Assert-MockCalled Invoke-SyncUserGroups -Times 0 -Scope It
@@ -470,6 +506,7 @@ Describe 'Invoke-Sync' {
 
     It 'Should call the user groups sync operation if configured' {
         Invoke-Sync @{EnableUserGroupsSync = $true } { }
+
         Assert-MockCalled Invoke-SyncPrework -Times 1 -Scope It
         Assert-MockCalled Invoke-SyncUser -Times 1 -Scope It
         Assert-MockCalled Invoke-SyncUserGroups -Times 1 -Scope It

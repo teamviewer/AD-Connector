@@ -15,26 +15,28 @@ Describe 'Get-ActiveDirectoryGroup' {
                 ([pscustomobject]@{} | Add-Member @{ Path = 'LDAP://TestPath2' } -PassThru)
             )
         }
-        Mock New-Object { return $mockedDirectorySearcher } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Mock New-Object { return $mockedDirectorySearcher } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
         Get-ActiveDirectoryGroup | Should -Be @( 'TestPath1', 'TestPath2', 'TestPath3' ) # Sorted
-        Assert-MockCalled New-Object -Times 1 `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Assert-MockCalled New-Object -Times 1 -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
     }
 
     It 'Should set the optional search root' {
         $mockedDirectorySearcher = @{} | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @()
         }
-        Mock New-Object { return $mockedDirectorySearcher } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
-        Mock New-Object { return 'Test123' } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectoryEntry' }
+
+        Mock New-Object { return $mockedDirectorySearcher } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+        Mock New-Object { return 'Test123' } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectoryEntry' }
+
         Get-ActiveDirectoryGroup 'TestRoot'
+
         Assert-MockCalled New-Object -Times 1 -ParameterFilter {
-            $TypeName -eq 'System.DirectoryServices.DirectoryEntry' -And
-            $ArgumentList -eq @('TestRoot')
+            $TypeName -eq 'System.DirectoryServices.DirectoryEntry' -And $ArgumentList -eq @('TestRoot')
         }
+
         $mockedDirectorySearcher.SearchRoot | Should -Be 'Test123'
     }
 
@@ -49,11 +51,12 @@ Describe 'Get-ActiveDirectoryGroup' {
                 ([pscustomobject]@{} | Add-Member @{ Path = 'GC://myglobalcatalog/TestPath6' } -PassThru)
             )
         }
-        Mock New-Object { return $mockedDirectorySearcher } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Mock New-Object { return $mockedDirectorySearcher } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
         Get-ActiveDirectoryGroup | Should -Be @( 'TestPath1', 'TestPath2', 'TestPath3', 'TestPath4', 'TestPath5', 'TestPath6' ) # Sorted
-        Assert-MockCalled New-Object -Times 1 `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Assert-MockCalled New-Object -Times 1 -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
     }
 }
 
@@ -77,8 +80,9 @@ Describe 'Get-ActiveDirectoryGroupMember' {
                 (Add-TestUser -mail 'user2@example.test' -name 'User 2' -uac 1)
             )
         }
-        Mock New-Object { return $mockedDirectorySearcher } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Mock New-Object { return $mockedDirectorySearcher } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
         $result = @(Get-ActiveDirectoryGroupMember $null $true 'TestPath')
         $result.Length | Should -Be 3
         $result[0].Email | Should -Be 'user3@example.test'
@@ -97,8 +101,9 @@ Describe 'Get-ActiveDirectoryGroupMember' {
                 (Add-TestUser -mail 'inactive@example.test' -name 'Inactive User' -uac 2)
             )
         }
-        Mock New-Object { return $mockedDirectorySearcher } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Mock New-Object { return $mockedDirectorySearcher } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
         $result = @(Get-ActiveDirectoryGroupMember $null $true 'TestPath')
         $result.Length | Should -Be 1
         $result[0].Email | Should -Be 'active@example.test'
@@ -109,12 +114,12 @@ Describe 'Get-ActiveDirectoryGroupMember' {
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
         } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 `
-                    -proxyaddr 'smtp:secondary@example.test')
+                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 -proxyaddr 'smtp:secondary@example.test')
             )
         }
-        Mock New-Object { return $mockedDirectorySearcher } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Mock New-Object { return $mockedDirectorySearcher } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
         $result = @(Get-ActiveDirectoryGroupMember $null $true 'TestPath')
         $result.Length | Should -Be 1
         $result[0].Email | Should -Be 'primary@example.test'
@@ -126,12 +131,12 @@ Describe 'Get-ActiveDirectoryGroupMember' {
             PropertiesToLoad = (New-Object System.Collections.ArrayList)
         } | Add-Member -PassThru -MemberType ScriptMethod -Name "FindAll" -Value {
             return @(
-                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 `
-                    -proxyaddr 'smtp:secondary@example.test  ')
+                (Add-TestUser -mail 'primary@example.test' -name 'Test User' -uac 1 -proxyaddr 'smtp:secondary@example.test  ')
             )
         }
-        Mock New-Object { return $mockedDirectorySearcher } `
-            -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
+        Mock New-Object { return $mockedDirectorySearcher } -ParameterFilter { $TypeName -eq 'System.DirectoryServices.DirectorySearcher' }
+
         $result = @(Get-ActiveDirectoryGroupMember $null $true 'TestPath')
         $result.Length | Should -Be 1
         $result[0].SecondaryEmails | Should -Be @('secondary@example.test')

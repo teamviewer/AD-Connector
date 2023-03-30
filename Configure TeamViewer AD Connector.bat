@@ -1,5 +1,5 @@
-@echo off
-setlocal
+@ECHO OFF
+SETLOCAL
 
-cd /D "%~dp0"
-powershell -NonInteractive -NoProfile -ExecutionPolicy bypass -Command "& {.\TeamViewerADConnector\Invoke-Configuration.ps1 ; exit $LastExitCode }"
+CD /D "%~dp0"
+POWERSHELL -NonInteractive -NoProfile -ExecutionPolicy Bypass -Command "& {.\TeamViewerADConnector\Invoke-Configuration.ps1 ; exit $LastExitCode }"

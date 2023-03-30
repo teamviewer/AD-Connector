@@ -10,11 +10,13 @@ function Select-StringExcludeBlock {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         $pipelineInput
     )
+
     Begin {
         $include = $true
         $patternBegin = [Regex]::Escape($Begin)
         $patternEnd = [Regex]::Escape($End)
     }
+
     Process {
         $pipelineInput | ForEach-Object {
             if ($_ -match $patternBegin) {
