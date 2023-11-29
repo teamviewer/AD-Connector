@@ -2,8 +2,10 @@
 
 ## [1.5.0]
 
+- Removed company permissions
+- Removed Conditional Access synchronization support (access groups)
+- Harmonize code format
 - Updated year in copyright
-- Removed Conditional Access synchronization support.
 
 ## [1.4.1]
 
