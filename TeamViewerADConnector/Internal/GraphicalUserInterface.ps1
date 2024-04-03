@@ -11,7 +11,7 @@ function Get-GraphicalUserInterfaceSupportedLocale() {
 }
 
 function Get-SupportedScheduledSyncIntervals() {
-    return @('4', '8', '16', '24')
+    return @(4, 8, 16, 24)
 }
 
 function Get-GraphicalUserInterfaceLocale([string] $culture = 'en') {
@@ -152,7 +152,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     $scheduledSyncIntervalsData = (Get-SupportedScheduledSyncIntervals | ForEach-Object {
             New-Object PSObject -Prop @{
                 Tag     = "$_"
-                Content = "$_"
+                Content = $_
             }
         })
     # Scheduled sync view model

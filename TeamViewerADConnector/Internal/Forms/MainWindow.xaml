@@ -130,7 +130,7 @@ See file LICENSE
                                         <RadioButton Name="RdBtnAccountTypePassword" Margin="0,10,5,5" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseDefaultPassword}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="140"/>
+                                                    <ColumnDefinition Width="160"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,0,5" Text="{Binding L.AccountTypeDefaultPassword}" FontSize="12"/>
@@ -140,7 +140,7 @@ See file LICENSE
                                         <RadioButton Name="RdBtnAccountTypeSso" Margin="0,10,5,5" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseSsoCustomerId}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="140"/>
+                                                    <ColumnDefinition Width="160"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
@@ -162,7 +162,7 @@ See file LICENSE
                                 </Grid>
                                 <Grid VerticalAlignment="Top">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="160"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Label Margin="5" Content="{Binding L.LabelLanguage}" HorizontalContentAlignment="Left" FontSize="12"/>

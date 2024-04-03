@@ -1,7 +1,7 @@
 {
-    "AccountTypeDefaultPassword": "Predefined password",
-    "AccountTypeGeneratedPassword": "Random password",
-    "AccountTypeSso": "Single Sign-On (SSO)",
+    "AccountTypeDefaultPassword": "Predefined password:",
+    "AccountTypeGeneratedPassword": "Random password:",
+    "AccountTypeSso": "Single Sign-On (SSO):",
     "Add": "Add",
     "Apply": "Apply",
     "Cancel": "Cancel",

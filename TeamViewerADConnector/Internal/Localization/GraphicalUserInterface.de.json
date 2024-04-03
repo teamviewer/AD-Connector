@@ -1,6 +1,6 @@
 {
-    "AccountTypeDefaultPassword": "Vorgegebenem Passwort:",
-    "AccountTypeGeneratedPassword": "Generiertem Passwort:",
+    "AccountTypeDefaultPassword": "Vorgegebenes Passwort:",
+    "AccountTypeGeneratedPassword": "Zufällig generiertes Passwort",
     "AccountTypeSso": "Single Sign-On(SSO):",
     "Add": "Hinzufügen",
     "Apply": "Übernehmen",
