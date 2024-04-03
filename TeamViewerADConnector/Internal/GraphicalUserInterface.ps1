@@ -10,6 +10,10 @@ function Get-GraphicalUserInterfaceSupportedLocale() {
         'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sk', 'sr', 'sv', 'th', 'tr', 'uk', 'vi', 'zh_CN', 'zh_TW')
 }
 
+function Get-SupportedScheduledSyncIntervals() {
+    return @(4, 8, 16, 24)
+}
+
 function Get-GraphicalUserInterfaceLocale([string] $culture = 'en') {
     $locales = @{}
 
@@ -144,6 +148,13 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
                 Content = $locale."UserLanguage_$_"
             } })
 
+
+    $scheduledSyncIntervalsData = (Get-SupportedScheduledSyncIntervals | ForEach-Object {
+            New-Object PSObject -Prop @{
+                Tag     = "$_"
+                Content = $_
+            }
+        })
     # Scheduled sync view model
     $scheduledSyncData = (New-Object PSObject -Prop @{
             IsEnabled     = $false
@@ -169,13 +180,14 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     # Main Window
     $mainWindow = (Get-GraphicalUserInterfaceWindow "$PSScriptRoot\Forms\MainWindow.xaml")
     $mainWindow.DataContext = (New-Object PSObject -Prop @{
-            L                     = $locale
-            LanguagesData         = $languagesData
-            ConfigurationData     = $configuration
-            ScheduledSyncData     = $scheduledSyncData
-            ADGroupsData          = $adGroups
-            ADGroupsSelectionData = $adGroupsSelection
-            ScriptVersion         = $ScriptVersion
+            L                      = $locale
+            LanguagesData          = $languagesData
+            ScheduledSyncIntervals = $scheduledSyncIntervalsData
+            ConfigurationData      = $configuration
+            ScheduledSyncData      = $scheduledSyncData
+            ADGroupsData           = $adGroups
+            ADGroupsSelectionData  = $adGroupsSelection
+            ScriptVersion          = $ScriptVersion
         })
 
     # AD Groups ComboBox filtering
@@ -230,8 +242,16 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
 
     # Click Handler Button "Save & Run"
     $mainWindow.FindName('BtnSaveAndRun').Add_Click( {
+            $mainWindow.DataContext.ConfigurationData.TestRun = $false
             Save-Configuration $mainWindow.DataContext.ConfigurationData
 
+            Invoke-GraphicalUserInterfaceSync -configuration $mainWindow.DataContext.ConfigurationData -culture $culture -owner $mainWindow
+        })
+
+
+    $mainWindow.FindName('BtnSaveAndTestRun').Add_Click({
+            $mainWindow.DataContext.ConfigurationData.TestRun = $true
+            Save-Configuration $mainWindow.DataContext.ConfigurationData
             Invoke-GraphicalUserInterfaceSync -configuration $mainWindow.DataContext.ConfigurationData -culture $culture -owner $mainWindow
         })
 

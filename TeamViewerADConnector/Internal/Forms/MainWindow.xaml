@@ -1,20 +1,21 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!--
+<?xml version="1.0" encoding="UTF-8" ?><!--
 Copyright (c) 2018-2023 TeamViewer Germany GmbH
 See file LICENSE
 -->
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase" Width="620" MinWidth="620" MinHeight="770" WindowStartupLocation="CenterScreen" SizeToContent="Height">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase" Width="800" MinWidth="800" MinHeight="580" WindowStartupLocation="CenterScreen" SizeToContent="Height">
     <Window.Title>
         <MultiBinding StringFormat="{}{0} {1}">
-            <Binding Path="L.Title" />
-            <Binding Path="ScriptVersion" />
+            <Binding Path="L.Title"/>
+            <Binding Path="ScriptVersion"/>
         </MultiBinding>
     </Window.Title>
     <Window.Resources>
         <CollectionViewSource x:Key="LanguagesViewSource" Source="{Binding LanguagesData}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Content" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        <CollectionViewSource x:Key="ScheduledSyncIntervalViewSource" Source="{Binding ScheduledSyncIntervals}">
             <CollectionViewSource.SortDescriptions>
                 <scm:SortDescription PropertyName="Content" Direction="Ascending"/>
             </CollectionViewSource.SortDescriptions>
@@ -27,53 +28,51 @@ See file LICENSE
                     <TabItem Header="{Binding L.TabHeaderSynchronization}">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition SharedSizeGroup="ConfigurationTabHeight" />
+                                <RowDefinition SharedSizeGroup="ConfigurationTabHeight"/>
                             </Grid.RowDefinitions>
-                            <StackPanel Margin="10">
+                            <StackPanel Margin="5">
                                 <Grid VerticalAlignment="Top">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="100" />
-                                    </Grid.ColumnDefinitions>
-                                    <Label Margin="5" Content="{Binding L.LabelApiToken}" HorizontalContentAlignment="Right" />
-                                    <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding ConfigurationData.ApiToken}" />
-                                    <Button Grid.Column="2" Margin="5" Content="{Binding L.TestToken}" Name="BtnTestToken" />
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Margin="3" Content="{Binding L.LabelSyncHeader}" HorizontalContentAlignment="Left" FontSize="12"/>
+                                    <Label Grid.Row="1" Margin="3" Content="{Binding L.LabelADHeader}" HorizontalContentAlignment="Left" FontWeight="Bold" FontSize="12"/>
                                 </Grid>
                                 <Grid VerticalAlignment="Top">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="160"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="100"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Margin="5" Content="{Binding L.LabelADGroups}" HorizontalContentAlignment="Right" />
-                                    <ComboBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Name="CbxNewADGroup" ItemsSource="{Binding ADGroupsData}" Text="{Binding ADGroupsSelectionData.AddValue}" IsEditable="True" IsTextSearchEnabled="False" />
+                                    <Label Margin="5" Content="{Binding L.LabelADGroups}" HorizontalContentAlignment="Right" FontSize="12"/>
+                                    <ComboBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Name="CbxNewADGroup" ItemsSource="{Binding ADGroupsData}" Text="{Binding ADGroupsSelectionData.AddValue}" IsEditable="True" IsTextSearchEnabled="False"/>
                                     <Button Grid.Column="2" Margin="5" Content="{Binding L.Add}" Name="BtnAddGroup">
                                         <Button.Style>
                                             <Style TargetType="Button">
-                                                <Setter Property="IsEnabled" Value="true" />
+                                                <Setter Property="IsEnabled" Value="true"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=CbxNewADGroup, Path=Text}" Value="">
-                                                        <Setter Property="IsEnabled" Value="false" />
+                                                        <Setter Property="IsEnabled" Value="false"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Button.Style>
                                     </Button>
-                                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding L.LabelSelectedADGroups}" Margin="5,5,5,0" />
-                                    <ListView Grid.Column="1" Grid.Row="2" Height="120" Margin="5" Name="SelectedADGroups" ItemsSource="{Binding ConfigurationData.ActiveDirectoryGroups}" SelectedValue="{Binding ADGroupsSelectionData.RemoveValue}" SelectionMode="Single" />
+                                    <Label Grid.Column="0" Grid.Row="2" Content="{Binding L.LabelSelectedADGroups}" Margin="5" HorizontalContentAlignment="Right" FontSize="12"/>
+                                    <ListView Grid.Column="1" Grid.Row="2" Height="120" Margin="5" Name="SelectedADGroups" ItemsSource="{Binding ConfigurationData.ActiveDirectoryGroups}" SelectedValue="{Binding ADGroupsSelectionData.RemoveValue}" SelectionMode="Single"/>
                                     <Button Grid.Column="2" Grid.Row="2" Margin="5" Content="{Binding L.Remove}" Padding="4" VerticalAlignment="Top" Name="BtnRemoveGroup">
                                         <Button.Style>
                                             <Style TargetType="Button">
-                                                <Setter Property="IsEnabled" Value="true" />
+                                                <Setter Property="IsEnabled" Value="true"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ElementName=SelectedADGroups, Path=SelectedItems.Count}" Value="0">
-                                                        <Setter Property="IsEnabled" Value="false" />
+                                                        <Setter Property="IsEnabled" Value="false"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -81,125 +80,183 @@ See file LICENSE
                                     </Button>
                                 </Grid>
                                 <Grid VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Margin="3" Content="{Binding L.LabelOptions}" HorizontalContentAlignment="Left" FontWeight="Bold" FontSize="12"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="5"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Label Margin="5" Content="{Binding L.LabelOptions}" HorizontalContentAlignment="Right" />
                                     <StackPanel Grid.Column="1" Margin="5">
-                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.TestRun}" IsChecked="{Binding ConfigurationData.TestRun}" />
-                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.DeactivateUsers}" IsChecked="{Binding ConfigurationData.DeactivateUsers}" />
-                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.RecursiveGroups}" IsChecked="{Binding ConfigurationData.RecursiveGroups}" />
-                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.UseSecondaryEmails}" IsChecked="{Binding ConfigurationData.UseSecondaryEmails}" />
+                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.RecursiveGroups}" IsChecked="{Binding ConfigurationData.RecursiveGroups}"/>
+                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.EnableUserGroupsSync}" IsChecked="{Binding ConfigurationData.EnableUserGroupsSync}"/>
+                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.UseSecondaryEmails}" IsChecked="{Binding ConfigurationData.UseSecondaryEmails}"/>
+                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.DeactivateUsers}" IsChecked="{Binding ConfigurationData.DeactivateUsers}"/>
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="{Binding L.TabHeaderAccounts}">
+                    <TabItem Header="{Binding L.TabHeaderUserSettings}">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition SharedSizeGroup="ConfigurationTabHeight" />
+                                <RowDefinition SharedSizeGroup="ConfigurationTabHeight"/>
                             </Grid.RowDefinitions>
-                            <StackPanel Margin="10">
+                            <StackPanel Margin="5">
                                 <Grid VerticalAlignment="Top">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Label Margin="5" Content="{Binding L.LabelLanguage}" HorizontalContentAlignment="Right" />
-                                    <ComboBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" ItemsSource="{Binding Source={StaticResource LanguagesViewSource}}" SelectedValuePath="Tag" DisplayMemberPath="Content" SelectedValue="{Binding ConfigurationData.UserLanguage}" />
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Margin="3" Content="{Binding L.LabelUserSettingsHeader}" HorizontalContentAlignment="Left" FontSize="12"/>
+                                    <Label Grid.Row="1" Margin="3" Content="{Binding L.LabelAccountType}" HorizontalContentAlignment="Left" FontWeight="Bold" FontSize="12"/>
                                 </Grid>
                                 <Grid VerticalAlignment="Top">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Label Margin="5" Content="{Binding L.LabelAccountType}" HorizontalContentAlignment="Right" />
-                                    <StackPanel Grid.Column="1" Margin="5">
-                                        <RadioButton Name="RdBtnAccountTypePassword" Margin="0,7,5,10" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseDefaultPassword}">
-                                            <StackPanel>
-                                                <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,5" Text="{Binding L.AccountTypeDefaultPassword}" />
-                                                <TextBox VerticalContentAlignment="Center" Padding="4" Text="{Binding ConfigurationData.DefaultPassword}" IsEnabled="{Binding ElementName=RdBtnAccountTypePassword, Path=IsChecked}" />
-                                            </StackPanel>
+                                    <StackPanel Grid.Column="0" Margin="5">
+                                        <RadioButton Name="RdBtnAccountTypeGeneratedPassword" Margin="0,10,5,5" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseGeneratedPassword}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding L.AccountTypeGeneratedPassword}" FontSize="12"/>
+                                            </Grid>
                                         </RadioButton>
-                                        <RadioButton Name="RdBtnAccountTypeGeneratedPassword" Margin="0,10,5,5" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseGeneratedPassword}">
-                                            <StackPanel>
-                                                <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding L.AccountTypeGeneratedPassword}" />
-                                            </StackPanel>
+                                        <RadioButton Name="RdBtnAccountTypePassword" Margin="0,10,5,5" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseDefaultPassword}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="160"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,0,5" Text="{Binding L.AccountTypeDefaultPassword}" FontSize="12"/>
+                                                <TextBox Grid.Column="1" VerticalContentAlignment="Center" Padding="4" Text="{Binding ConfigurationData.DefaultPassword}" IsEnabled="{Binding ElementName=RdBtnAccountTypePassword, Path=IsChecked}"/>
+                                            </Grid>
                                         </RadioButton>
-                                        <RadioButton Name="RdBtnAccountTypeSso" Margin="0,10,5,5" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseSsoCustomerId}">
-                                            <StackPanel>
-                                                <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding L.AccountTypeSso}" />
-                                                <Label Margin="0,10,0,5" Padding="0" Content="{Binding L.LabelCustomerId}" IsEnabled="{Binding ElementName=TxtBxSsoCustomerId, Path=IsEnabled}" />
-                                                <TextBox Name="TxtBxSsoCustomerId" VerticalContentAlignment="Center" Padding="4" Text="{Binding ConfigurationData.SsoCustomerId}" IsEnabled="{Binding ElementName=RdBtnAccountTypeSso, Path=IsChecked}" />
-                                            </StackPanel>
+                                        <RadioButton Name="RdBtnAccountTypeSso" Margin="0,10,5,5" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" GroupName="AccountTypeGroup" IsChecked="{Binding ConfigurationData.UseSsoCustomerId}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="160"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding L.AccountTypeSso}" FontSize="12"/>
+                                                <Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0" Content="{Binding L.LabelCustomerId}" IsEnabled="{Binding ElementName=TxtBxSsoCustomerId, Path=IsEnabled}" Margin="0,10,0,0"/>
+                                                <TextBox Grid.Column="1" Grid.Row="1" Name="TxtBxSsoCustomerId" VerticalContentAlignment="Center" Padding="4" Text="{Binding ConfigurationData.SsoCustomerId}" IsEnabled="{Binding ElementName=RdBtnAccountTypeSso, Path=IsChecked}" Margin="0,10,0,0"/>
+                                            </Grid>
                                         </RadioButton>
                                     </StackPanel>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Margin="5" Content="{Binding L.LabelOtherUserSettings}" HorizontalContentAlignment="Left" FontWeight="Bold" FontSize="12"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="160"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Margin="5" Content="{Binding L.LabelLanguage}" HorizontalContentAlignment="Left" FontSize="12"/>
+                                    <ComboBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" ItemsSource="{Binding Source={StaticResource LanguagesViewSource}}" SelectedValuePath="Tag" DisplayMemberPath="Content" SelectedValue="{Binding ConfigurationData.UserLanguage}"/>
                                 </Grid>
                             </StackPanel>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="{Binding L.TabHeaderGroups}">
+                    <TabItem Header="{Binding L.TabHeaderSettings}">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition SharedSizeGroup="ConfigurationTabHeight" />
+                                <RowDefinition SharedSizeGroup="ConfigurationTabHeight"/>
                             </Grid.RowDefinitions>
-                            <StackPanel Margin="10">
-                                <CheckBox VerticalAlignment="Top" Margin="5" Content="{Binding L.EnableUserGroupsSync}" IsChecked="{Binding ConfigurationData.EnableUserGroupsSync}" />
+                            <StackPanel Margin="5">
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Margin="3" Content="{Binding L.LabelADConnectorSettings}" HorizontalContentAlignment="Left" FontSize="12"/>
+                                    <Label Grid.Row="1" Margin="3" Content="{Binding L.LabelAuthentication}" HorizontalContentAlignment="Left" FontWeight="Bold" FontSize="12"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Margin="5" Content="{Binding L.LabelApiToken}" HorizontalContentAlignment="Right"/>
+                                    <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding ConfigurationData.ApiToken}"/>
+                                    <Button Grid.Column="2" Margin="5" Content="{Binding L.TestToken}" Name="BtnTestToken"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Margin="3" Content="{Binding L.SectionScheduledSync}" HorizontalContentAlignment="Left" FontWeight="Bold" FontSize="12"/>
+                                    <Label Grid.Row="1" Margin="3" Content="{Binding L.LabelScheduledTaskHeader}" HorizontalContentAlignment="Left" FontSize="12"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Margin="5" Content="{Binding L.LabelStatus}" HorizontalContentAlignment="Right" FontSize="12"/>
+                                    <Label Grid.Column="1" Margin="0,5,5,5" Content="{Binding ScheduledSyncData.StatusMessage}" FontSize="12"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Margin="5" Content="{Binding L.LabelInterval}" HorizontalContentAlignment="Right" FontSize="12"/>
+                                    <ComboBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" ItemsSource="{Binding Source={StaticResource ScheduledSyncIntervalViewSource}}" SelectedValuePath="Tag" DisplayMemberPath="Content" SelectedValue="{Binding ScheduledSyncData.Interval}" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}"/>
+                                    <Label Grid.Column="2" Margin="3" Content="{Binding L.IntervalUnit}" FontSize="12"/>
+                                    <Button Grid.Column="3" Margin="5" Padding="4" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}" Content="{Binding L.Install}" Name="BtnInstallSched"/>
+                                    <Button Grid.Column="4" Margin="5" Padding="4" IsEnabled="{Binding ScheduledSyncData.IsEnabled}" Content="{Binding L.Uninstall}" Name="BtnUninstallSched"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Margin="3" Content="{Binding L.LabelLogging}" HorizontalContentAlignment="Left" FontWeight="Bold" FontSize="12"/>
+                                    <Label Grid.Row="1" Margin="3" Content="{Binding L.LabelLogDirectoryHeader}" HorizontalContentAlignment="Left" FontSize="12"/>
+                                </Grid>
+                                <Grid VerticalAlignment="Top">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Margin="5" Content="{Binding L.LabelLogDirectory}" HorizontalContentAlignment="Right"/>
+                                    <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding ScheduledSyncData.LogDirectory}" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}"/>
+                                    <Button Grid.Column="2" Margin="5" Name="BtnChangeLogDirectory" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}">...</Button>
+                                </Grid>
                             </StackPanel>
                         </Grid>
                     </TabItem>
                 </TabControl>
                 <Grid VerticalAlignment="Top" Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="120"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="1" Margin="5" Padding="4" Content="{Binding L.Save}" Name="BtnSave" />
-                    <Button Grid.Column="2" Margin="5" Padding="4" Content="{Binding L.SaveAndRun}" Name="BtnSaveAndRun" />
-                </Grid>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="{Binding L.SectionScheduledSync}">
-            <StackPanel Margin="5">
-                <Grid VerticalAlignment="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Label Margin="5" Content="{Binding L.LabelStatus}" HorizontalContentAlignment="Right" />
-                    <Label Grid.Column="1" Margin="0,5,5,5" Content="{Binding ScheduledSyncData.StatusMessage}" />
-                </Grid>
-                <Grid VerticalAlignment="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
-                    <Label Margin="5" Content="{Binding L.LabelInterval}" HorizontalContentAlignment="Right" />
-                    <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" TextAlignment="Right" Text="{Binding ScheduledSyncData.Interval}" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}" />
-                    <Label Grid.Column="2" Margin="0,5,5,5" Content="{Binding L.IntervalUnit}" />
-                </Grid>
-                <Grid VerticalAlignment="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
-                    <Label Margin="5" Content="{Binding L.LabelLogDirectory}" HorizontalContentAlignment="Right" />
-                    <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding ScheduledSyncData.LogDirectory}" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}"/>
-                    <Button Grid.Column="2" Margin="5" Name="BtnChangeLogDirectory" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}">...</Button>
-                </Grid>
-                <Grid VerticalAlignment="Top" Margin="0,20,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="1" Margin="5" Padding="4" IsEnabled="{Binding ScheduledSyncData.IsNotEnabled}" Content="{Binding L.Install}" Name="BtnInstallSched" />
-                    <Button Grid.Column="2" Margin="5" Padding="4" IsEnabled="{Binding ScheduledSyncData.IsEnabled}" Content="{Binding L.Uninstall}" Name="BtnUninstallSched" />
+                    <Button Grid.Column="1" Margin="5" Padding="4" Content="{Binding L.Save}" Name="BtnSave" Command="{Binding SaveCommand}"/>
+                    <Button Grid.Column="2" Margin="5" Padding="4" Content="{Binding L.TestRun}" Name="BtnSaveAndTestRun" Command="{Binding SaveAndTestRunCommand}"/>
+                    <Button Grid.Column="3" Margin="5" Padding="4" Content="{Binding L.SaveAndRun}" Name="BtnSaveAndRun" Command="{Binding SaveAndRunCommand}"/>
                 </Grid>
             </StackPanel>
         </GroupBox>
