@@ -54,7 +54,6 @@ if (!$principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Adminis
 
 (. "$PSScriptRoot\Internal\Configuration.ps1")
 (. "$PSScriptRoot\Internal\ActiveDirectory.ps1")
-(. "$PSScriptRoot\Internal\TeamViewer.ps1")
 (. "$PSScriptRoot\Internal\ScheduledSync.ps1")
 (. "$PSScriptRoot\Internal\GraphicalUserInterface.ps1")
 

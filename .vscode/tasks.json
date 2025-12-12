@@ -5,7 +5,7 @@
         {
             "label": "Lint (via PSScriptAnalyzer)",
             "type": "shell",
-            "command": "Invoke-ScriptAnalyzer -Path '${workspaceFolder}' -Severity Information, Warning, Error -ExcludeRule PSReviewUnusedParameter -Recurse",
+            "command": "Invoke-ScriptAnalyzer -Path '${workspaceFolder}' -Settings '${workspaceFolder}/PSScriptAnalyzerSettings.psd1' -Severity Information, Warning, Error -ExcludeRule PSReviewUnusedParameter -Recurse",
             "group": {
                 "kind": "build",
                 "isDefault": true

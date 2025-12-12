@@ -136,23 +136,36 @@ function Invoke-SyncPrework($syncContext, $configuration, $progressHandler) {
     # Users are mapped to their email addresses.
     Write-SyncProgress -Handler $progressHandler -PercentComplete 10 'GetTeamViewerUsers'
     Write-SyncLog 'Fetching TeamViewer company users'
+    $teamViewerUsers = (Get-TeamViewerUser -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force) -PropertiesToLoad 'All')
+    Write-SyncLog "Retrieved $($teamViewerUsers.Count) TeamViewer company users"
 
-    $usersTVByEmail = (Get-TeamViewerUser $configuration.ApiToken)
-    Write-SyncLog "Retrieved $($usersTVByEmail.Count) TeamViewer company users"
+    #converting the array to hashtable
+    $usersTVByEmail = @{}
+    if ($teamViewerUsers -And $teamViewerUsers.Count -Gt 0) {
+        foreach ($tvUser in $teamViewerUsers) {
+            if ($tvUser -And $tvUser.email) {
+                $usersTVByEmail[$tvUser.email] = $tvUser
+            }
+        }
+    }
+    Write-Synclog "Created hashtable with $($usersTVByEmail.Count) TeamviewerUsers indexed by email"
 
     if ($configuration.EnableUserGroupsSync) {
         # Fetch all available user groups
         Write-SyncProgress -Handler $progressHandler -PercentComplete 20 'GetTeamViewerUserGroups'
         Write-SyncLog 'Fetching list of TeamViewer user groups.'
-        $userGroups = @(Get-TeamViewerUserGroup $configuration.ApiToken)
+        $userGroups = @(Get-TeamViewerUserGroup -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force))
         Write-SyncLog "Retrieved $($userGroups.Count) TeamViewer user groups."
 
         # Fetch user group members
         $userGroupMembersByGroup = @{}
 
         foreach ($userGroup in $userGroups) {
+            if ($null -eq $userGroup) {
+                continue
+            }
             Write-SyncLog "Fetching members of TeamViewer user group '$($userGroup.name)'"
-            $userGroupMembers = @(Get-TeamViewerUserGroupMember $configuration.ApiToken $userGroup.id)
+            $userGroupMembers = @(Get-TeamViewerUserGroupMember -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force) -Id $userGroup.id)
             Write-SyncLog "Retrieved $($userGroupMembers.Count) members of TeamViewer user group '$($userGroup.name)'"
             $userGroupMembersByGroup[$userGroup.id] = $userGroupMembers
         }
@@ -190,11 +203,22 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
             Write-SyncLog "Updating user $($userAd.email): $($changeset | Format-SyncUpdateUserChangeset)" -Extra $changeset
 
             if (!$configuration.TestRun) {
-                $updatedUser = $userAd.Clone()
-                $updatedUser.active = $true
+                $apiToken = ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force
+                $updateParams = @{
+                    ApiToken = $apiToken
+                    UserId   = $userTv.id
+                }
+
+                # build update properties
+                if ($changeset.name) {
+                    $updateParams['Name'] = $changeset.name
+                }
+                if ($changeset.PSObject.Properties['active']) {
+                    $updateParams['Active'] = $changeset.active
+                }
 
                 try {
-                    Edit-TeamViewerUser $configuration.ApiToken $userTv.id $updatedUser | Out-Null
+                    Set-TeamViewerUser @updateParams | Out-Null
                     $statistics.Updated++
                 }
                 catch {
@@ -210,29 +234,36 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
             Write-SyncLog "Creating user $($userAd.email)"
 
             if (!$configuration.TestRun) {
-                $newUser = $userAd.Clone()
-                $newUser.language = $configuration.UserLanguage
+                $apiToken = ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force
+                $newUserParams = @{
+                    ApiToken = $apiToken
+                    Email    = $userAd.Email
+                    Name     = $userAd.Name
+                }
 
+                # add password parameter (either default, generated, or SSO)
                 if ($configuration.UseDefaultPassword) {
-                    $newUser.password = $configuration.DefaultPassword
+                    $newUserParams['Password'] = ConvertTo-SecureString $configuration.DefaultPassword -AsPlainText -Force
+                }
+                elseif ($configuration.UseGeneratedPassword) {
+                    $newUserParams['WithoutPassword'] = $true
+                }
+                elseif ($configuration.UseSsoCustomerId) {
+                    $newUserParams['SsoCustomerIdentifier'] = ConvertTo-SecureString $configuration.SsoCustomerId -AsPlainText -Force
                 }
 
-                if ($configuration.UseGeneratedPassword) {
-                    $newUser.password = ''
-                }
-
-                if ($configuration.UseSsoCustomerId) {
-                    $newUser.sso_customer_id = $configuration.SsoCustomerId
+                # add optional parameters
+                if ($configuration.UserLanguage) {
+                    $newUserParams['Culture'] = $configuration.UserLanguage
                 }
 
                 if ($configuration.MeetingLicenseKey) {
-                    $newUser.meeting_license_key = $configuration.MeetingLicenseKey
+                    $newUserParams['MeetingLicenseKey'] = $configuration.MeetingLicenseKey
                 }
 
                 try {
-                    $addedUser = (Add-TeamViewerUser $configuration.ApiToken $newUser)
-                    $newUser.id = $addedUser.id
-                    $syncContext.UsersTeamViewerByEmail[$newUser.email] = $newUser
+                    $addedUser = (New-TeamViewerUser @newUserParams)
+                    $syncContext.UsersTeamViewerByEmail[$addedUser.Email] = $addedUser
                     $statistics.Created++
                 }
                 catch {
@@ -253,10 +284,12 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
         # Try to fetch the account information of the configured TeamViewer API token.
         # This information is used to not accidentially deactivate the token owner,
         # which would block further processing of the script.
-        Write-SyncLog 'Trying to fetch account information of configured TeamViewer API token'
-        $currentAccount = Get-TeamViewerAccount $configuration.ApiToken -NoThrow
 
-        if (!$currentAccount) {
+        Write-SyncLog 'Trying to fetch account information of configured TeamViewer API token'
+        try {
+            $currentAccount = Get-TeamViewerAccount -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force)
+        }
+        catch {
             Write-SyncLog 'Unable to determine token account information. Please check API token permissions.'
         }
 
@@ -271,7 +304,7 @@ function Invoke-SyncUser($syncContext, $configuration, $progressHandler) {
             Write-SyncLog "Deactivating TeamViewer user $($user.email)"
             if (!$configuration.TestRun) {
                 try {
-                    Disable-TeamViewerUser $configuration.ApiToken $user.id | Out-Null
+                    Set-TeamViewerUser -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force) -User $user.id -Property @{ active = $false } | Out-Null
                     $statistics.Deactivated++
                 }
                 catch {
@@ -316,7 +349,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
             Write-SyncLog "Creating user group '$adGroupName'"
             if (!$configuration.TestRun) {
                 try {
-                    $userGroup = (Add-TeamViewerUserGroup $configuration.ApiToken $adGroupName)
+                    $userGroup = (New-TeamViewerUserGroup -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force) -Name $adGroupName)
                     $statistics.CreatedGroups++
                 }
                 catch {
@@ -359,7 +392,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
                 $currentMembersToAdd = $_
 
                 try {
-                    (Add-TeamViewerUserGroupMember $configuration.ApiToken $userGroup.id $currentMembersToAdd) | Out-Null
+                    (Add-TeamViewerUserGroupMember -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force) $userGroup.id $currentMembersToAdd) | Out-Null
                     $statistics.AddedMembers += $currentMembersToAdd.Count
                 }
                 catch {
@@ -376,7 +409,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
         $membersToRemove = @()
 
         foreach ($userGroupMember in $userGroupMembers) {
-            $userTv = ($usersTv | Where-Object { $_.id.Trim('u') -Eq $userGroupMember.accountId })
+            $userTv = ($usersTv | Where-Object { $_.id.Trim('u') -eq $userGroupMember.accountId })
 
             if (!$userTv) {
                 Write-SyncLog "User '$($userGroupMember.name)' will be removed from user group '$($userGroup.name)'"
@@ -389,7 +422,7 @@ function Invoke-SyncUserGroups($syncContext, $configuration, $progressHandler) {
                 $currentMembersToRemove = $_
 
                 try {
-                    (Remove-TeamViewerUserGroupMember $configuration.ApiToken $userGroup.id $currentMembersToRemove) | Out-Null
+                    (Remove-TeamViewerUserGroupMember -ApiToken (ConvertTo-SecureString $configuration.ApiToken -AsPlainText -Force) $userGroup.id $currentMembersToRemove) | Out-Null
                     $statistics.RemovedMembers += $currentMembersToRemove.Count
                 }
                 catch {

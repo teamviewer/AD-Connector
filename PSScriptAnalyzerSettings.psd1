@@ -1,4 +1,4 @@
 @{
     Severity = @('Error', 'Warning', 'Information')
-    ExcludeRules = @('PSReviewUnusedParameter', 'PSUseSingularNouns')
+    ExcludeRules = @('PSReviewUnusedParameter', 'PSUseSingularNouns', 'PSAvoidUsingConvertToSecureStringWithPlainText')
 }
