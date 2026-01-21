@@ -222,7 +222,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     # Click Handler Button "Test Token"
     $mainWindow.FindName('BtnTestToken').Add_Click( {
             try {
-                $tokenValid = (Invoke-TeamViewerPing $mainWindow.DataContext.ConfigurationData.ApiToken)
+                 $tokenValid = (Invoke-TeamViewerPing -ApiToken (ConvertTo-SecureString $mainWindow.DataContext.ConfigurationData.ApiToken -AsPlainText -Force))
             }
             catch {
                 Write-Error "Token test failed: $_"

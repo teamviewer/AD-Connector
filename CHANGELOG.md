@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.0.0]
+
+- Imported TeamViewerPS module for API calls
+
 ## [1.5.0]
 
 - Removed company permissions

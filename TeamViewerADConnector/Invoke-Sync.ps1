@@ -74,7 +74,6 @@ $ScriptVersion = '{ScriptVersion}'
 
 (. "$PSScriptRoot\Internal\Configuration.ps1")
 (. "$PSScriptRoot\Internal\ActiveDirectory.ps1")
-(. "$PSScriptRoot\Internal\TeamViewer.ps1")
 (. "$PSScriptRoot\Internal\Sync.ps1")
 (. "$PSScriptRoot\Internal\Logfile.ps1")
 

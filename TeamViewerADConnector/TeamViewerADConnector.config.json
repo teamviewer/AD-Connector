@@ -1,0 +1,19 @@
+﻿{
+    "SsoCustomerId":  "",
+    "UseSsoCustomerId":  false,
+    "UseSecondaryEmails":  true,
+    "TestRun":  false,
+    "DeactivateUsers":  true,
+    "ApiToken":  "19441293-kBs8I0mmdKGK2dzYjh2O",
+    "EnableUserGroupsSync":  false,
+    "UseGeneratedPassword":  true,
+    "UserLanguage":  "en",
+    "ActiveDirectoryRoot":  "",
+    "ActiveDirectoryGroups":  [
+                                  "CN=TeamViewerPS Test,DC=eppads,DC=local"
+                              ],
+    "UseDefaultPassword":  false,
+    "MeetingLicenseKey":  "",
+    "RecursiveGroups":  true,
+    "DefaultPassword":  ""
+}
