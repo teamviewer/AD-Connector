@@ -18,6 +18,7 @@ function Import-Configuration($filename) {
         UseSecondaryEmails    = $true
         EnableUserGroupsSync  = $false
         MeetingLicenseKey     = ''
+        Environment           = 'global'
     }
 
     if (Test-Path $filename) {
@@ -35,7 +36,7 @@ function Import-Configuration($filename) {
 
 function Save-Configuration($config) {
     $excluded = @('Filename')
-    $configuration | Select-Object -Property * -ExcludeProperty $excluded | ConvertTo-Json | Set-Content -Encoding UTF8 -Path $configuration.Filename
+    $config | Select-Object -Property * -ExcludeProperty $excluded | ConvertTo-Json | Set-Content -Encoding UTF8 -Path $config.Filename
 }
 
 function Confirm-Configuration($config) {

@@ -15,5 +15,6 @@
     "UseDefaultPassword":  false,
     "MeetingLicenseKey":  "",
     "RecursiveGroups":  true,
-    "DefaultPassword":  ""
+    "DefaultPassword":  "",
+    "Environment":  "global"
 }

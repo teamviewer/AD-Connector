@@ -3,6 +3,7 @@
 ## [2.0.0]
 
 - Imported TeamViewerPS module for API calls
+- Added selection of environment in the UI
 
 ## [1.5.0]
 

@@ -40,6 +40,28 @@ function Get-GraphicalUserInterfaceWindow($file) {
     }
 }
 
+
+function Set-WebUriForEnvironment {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory)]
+        $configuration
+    )
+    switch ($configuration.Environment.ToLower()) {
+        'us' {
+            if ($PSCmdlet.ShouldProcess('Set to US endpoint')) {
+                Set-TeamViewerAPIUri -NewUri 'https://webapi.us.teamviewer.com/api/v1'
+            }
+        }
+        default {
+            if ($PSCmdlet.ShouldProcess('Set to global endpoint')) {
+                Set-TeamViewerAPIUri -Default $true
+            }
+        }
+    }
+}
+
+
 function Invoke-GraphicalUserInterfaceSync($configuration, [string] $culture, $owner) {
     $locale = (Get-GraphicalUserInterfaceLocale $culture)
 
@@ -244,7 +266,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     $mainWindow.FindName('BtnSaveAndRun').Add_Click( {
             $mainWindow.DataContext.ConfigurationData.TestRun = $false
             Save-Configuration $mainWindow.DataContext.ConfigurationData
-
+            Set-WebUriForEnvironment $mainWindow.DataContext.ConfigurationData
             Invoke-GraphicalUserInterfaceSync -configuration $mainWindow.DataContext.ConfigurationData -culture $culture -owner $mainWindow
         })
 
@@ -252,6 +274,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     $mainWindow.FindName('BtnSaveAndTestRun').Add_Click({
             $mainWindow.DataContext.ConfigurationData.TestRun = $true
             Save-Configuration $mainWindow.DataContext.ConfigurationData
+            Set-WebUriForEnvironment $mainWindow.DataContext.ConfigurationData
             Invoke-GraphicalUserInterfaceSync -configuration $mainWindow.DataContext.ConfigurationData -culture $culture -owner $mainWindow
         })
 
