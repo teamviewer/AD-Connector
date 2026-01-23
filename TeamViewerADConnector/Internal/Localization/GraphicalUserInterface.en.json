@@ -16,6 +16,7 @@
     "LabelAccountType": "Login Method:",
     "LabelADConnectorSettings": "Active Directory Connector Settings",
     "LabelApiToken": "API token:",
+    "LabelEnvironment": "Environment:",
     "LabelAuthentication": "Authentication:",
     "LabelCustomerId": "Customer Identifier:",
     "LabelInterval": "Interval:",

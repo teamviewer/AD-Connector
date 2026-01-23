@@ -16,6 +16,7 @@
     "LabelAccountType": "Anmeldeverfahren:",
     "LabelADConnectorSettings": "Einstellungen des Active Directory Connectors",
     "LabelApiToken": "API Token:",
+    "LabelEnvironment": "Umgebung:",
     "LabelAuthentication": "Authentifizierung:",
     "LabelCustomerId": "Customer ID:",
     "LabelDefaultPassword": "Init. Passwort:",
