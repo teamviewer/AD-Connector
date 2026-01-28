@@ -244,6 +244,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     # Click Handler Button "Test Token"
     $mainWindow.FindName('BtnTestToken').Add_Click( {
             try {
+                 Set-WebUriForEnvironment $mainWindow.DataContext.ConfigurationData
                  $tokenValid = (Invoke-TeamViewerPing -ApiToken (ConvertTo-SecureString $mainWindow.DataContext.ConfigurationData.ApiToken -AsPlainText -Force))
             }
             catch {
