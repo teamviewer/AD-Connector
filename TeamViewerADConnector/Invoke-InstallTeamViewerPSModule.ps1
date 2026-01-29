@@ -3,9 +3,9 @@ param(
     [string]$ModuleName = 'TeamViewerPS'
 )
 
-if (-not (Get-Module -Name $ModuleName -ErrorAction SilentlyContinue)) {
+if (-not (Get-InstalledModule -Name $ModuleName -ErrorAction SilentlyContinue)) {
     try {
-        Import-Module -Name $ModuleName -ErrorAction Stop
+        Install-Module -Name $ModuleName -Force -ErrorAction Stop
         Write-Verbose "Module $Modulename was succesfully installed"
     }
     catch {
