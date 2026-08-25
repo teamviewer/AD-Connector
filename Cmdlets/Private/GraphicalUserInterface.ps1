@@ -4,6 +4,8 @@
 [void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework')
 Add-Type -AssemblyName System.Windows.Forms
 
+. "$PSScriptRoot\ConvertTo-TeamViewerADCSecureString.ps1"
+
 function Get-GraphicalUserInterfaceSupportedLocale() {
     return @(
         'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'hr', 'hu', 'id', 'it', 'ja', 'ko', 'lt',
@@ -20,7 +22,7 @@ function Get-GraphicalUserInterfaceLocale([string] $culture = 'en') {
     (Get-ChildItem "$PSScriptRoot\Localization\GraphicalUserInterface.*.json" | ForEach-Object { $locales[($_.Name -split '\.')[1]] = (Get-Content $_ -Encoding UTF8 | Out-String | ConvertFrom-Json) })
 
     $locale = $locales[$culture]
-    if (!$locale) {
+    if (-not $locale) {
         $locale = $locales.en
     }
 
@@ -74,10 +76,10 @@ function Invoke-GraphicalUserInterfaceSync($configuration, [string] $culture, $o
     $context.ProgressWindow = $progressWindow
     $context.ProgressControl = $progressWindow.FindName('Progress')
     $context.MessageControl = $progressWindow.FindName('Message')
-    $context.Command = (Join-Path (Get-Item "$PSScriptRoot\..") 'Invoke-Sync.ps1')
+    $context.Command = (Join-Path (Get-Item "$PSScriptRoot\..") 'Invoke-TeamViewerADCSync.ps1')
     $context.ConfigurationFile = $configuration.Filename
 
-    # Run `Invoke-Sync` in a separate PowerShell instance
+    # Run `Invoke-TeamViewerADCSync` in a separate PowerShell instance
     $runspace = [RunspaceFactory]::CreateRunspace($Host)
     $runspace.ApartmentState = 'STA'
     $runspace.ThreadOptions = 'ReuseThread'
@@ -88,8 +90,10 @@ function Invoke-GraphicalUserInterfaceSync($configuration, [string] $culture, $o
             try {
                 & $context.Command -ConfigurationFile $context.ConfigurationFile -ProgressHandler {
                     param([int]$progress, [string]$message)
-                    $context.ProgressControl.Dispatcher.Invoke( { $context.ProgressControl.Value = $progress } )
-                    $context.MessageControl.Dispatcher.Invoke( { $context.MessageControl.Text = $context.Locale."Sync$message" } )
+                    $ProgressValue = $progress
+                    $MessageKey = $message
+                    $context.ProgressControl.Dispatcher.Invoke( { $context.ProgressControl.Value = $ProgressValue } )
+                    $context.MessageControl.Dispatcher.Invoke( { $context.MessageControl.Text = $context.Locale."Sync$MessageKey" } )
                 } | Write-Host
             }
             catch {
@@ -106,7 +110,7 @@ function Invoke-GraphicalUserInterfaceSync($configuration, [string] $culture, $o
             }
         })
 
-    $cmd.Runspace = $runspace
+    $data.Interval = (Get-TeamViewerADCScheduledInterval -Task $scheduledSync).TotalHours
 
     # Progress window close button
     $progressWindow.Add_Closing( {
@@ -156,13 +160,13 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
             $data.StatusMessage = $locale.ScheduledSyncDisabled
         }
 
-        if (!$data.IsEnabled) {
-            $data.Interval = (Get-ScheduledSyncInterval $scheduledSync).TotalHours
-            $data.LogDirectory = (Get-ScheduledSyncLogDirectory $scheduledSync)
+        if (-not $data.IsEnabled) {
+            $data.Interval = (Get-TeamViewerADCScheduledInterval $scheduledSync).TotalHours
+            $data.LogDirectory = (Get-ScheduledSyncLogDirectory -Task $scheduledSync)
         }
 
         $data.IsEnabled = $enabled
-        $data.IsNotEnabled = (!$enabled)
+        $data.IsNotEnabled = (-not $enabled)
     }
 
     $languagesData = (Get-GraphicalUserInterfaceSupportedLocale | ForEach-Object { New-Object PSObject -Prop @{
@@ -225,7 +229,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
                     return $args[0].ToString().ToLowerInvariant().Contains($filterText)
                 }
 
-                if (!$adGroupsComboBox.IsDropDownOpen) {
+                if (-not $adGroupsComboBox.IsDropDownOpen) {
                     $textBox = $adGroupsComboBox.Template.FindName('PART_EditableTextBox', $adGroupsComboBox)
                     $cursorPos = $textBox.SelectionStart
                     $adGroupsComboBox.IsDropDownOpen = $true
@@ -245,7 +249,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     $mainWindow.FindName('BtnTestToken').Add_Click( {
             try {
                 Set-WebUriForEnvironment $mainWindow.DataContext.ConfigurationData
-                $tokenValid = (Invoke-TeamViewerPing -ApiToken (ConvertTo-SecureString $mainWindow.DataContext.ConfigurationData.ApiToken -AsPlainText -Force))
+                $tokenValid = (Invoke-TeamViewerPing -ApiToken (ConvertTo-TeamViewerADCSecureString -Value $mainWindow.DataContext.ConfigurationData.ApiToken))
             }
             catch {
                 Write-Error "Token test failed: $_"
@@ -260,13 +264,13 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
 
     # Click Handler Button "Save"
     $mainWindow.FindName('BtnSave').Add_Click( {
-            Save-Configuration $mainWindow.DataContext.ConfigurationData
+            Save-TeamViewerADCConfiguration $mainWindow.DataContext.ConfigurationData
         })
 
     # Click Handler Button "Save & Run"
     $mainWindow.FindName('BtnSaveAndRun').Add_Click( {
             $mainWindow.DataContext.ConfigurationData.TestRun = $false
-            Save-Configuration $mainWindow.DataContext.ConfigurationData
+            Save-TeamViewerADCConfiguration $mainWindow.DataContext.ConfigurationData
             Set-WebUriForEnvironment $mainWindow.DataContext.ConfigurationData
             Invoke-GraphicalUserInterfaceSync -configuration $mainWindow.DataContext.ConfigurationData -culture $culture -owner $mainWindow
         })
@@ -274,7 +278,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
 
     $mainWindow.FindName('BtnSaveAndTestRun').Add_Click({
             $mainWindow.DataContext.ConfigurationData.TestRun = $true
-            Save-Configuration $mainWindow.DataContext.ConfigurationData
+            Save-TeamViewerADCConfiguration $mainWindow.DataContext.ConfigurationData
             Set-WebUriForEnvironment $mainWindow.DataContext.ConfigurationData
             Invoke-GraphicalUserInterfaceSync -configuration $mainWindow.DataContext.ConfigurationData -culture $culture -owner $mainWindow
         })
@@ -339,7 +343,7 @@ function Invoke-GraphicalUserInterfaceConfiguration($configuration, [string] $cu
     # Click Handler Button "Uninstall" (Scheduled Task)
     $mainWindow.FindName('BtnUninstallSched').Add_Click( {
             try {
-                Uninstall-ScheduledSync
+                Remove-TeamViewerADCScheduledTask
             }
             catch {
                 Write-Error "Failed to uninstall scheduled task: $_"

@@ -22,12 +22,12 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateRangeAttribute] } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should have Log_Basename parameter as mandatory' {
+        It 'Should have optional Log_Basename parameter' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $param = $commandInfo.Parameters['Log_Basename']
             $param | Should -Not -BeNullOrEmpty
-            $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and $_.Mandatory } | Should -Not -BeNullOrEmpty
+            $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and $_.Mandatory } | Should -BeNullOrEmpty
         }
 
         It 'Should have Progress_Handler parameter as ScriptBlock' {
@@ -87,13 +87,13 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match '\[CmdletBinding'
         }
 
-        It 'Should define begin, process, and end blocks' {
+        It 'Should not define begin/process blocks when lifecycle behavior is unnecessary' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'begin\s*\{'
-            $scriptContent | Should -Match 'process\s*\{'
+            $scriptContent | Should -Not -Match 'begin\s*\{'
+            $scriptContent | Should -Not -Match 'process\s*\{'
         }
     }
 
@@ -144,15 +144,16 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
     }
 
     Context 'Script block validation' {
-        It 'Should source Configuration.ps1 in process block' {
+        It 'Should source required configuration helpers' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Configuration\.ps1'
+            $scriptContent | Should -Match 'Import-TeamViewerADCConfiguration\.ps1'
+            $scriptContent | Should -Match 'Test-TeamViewerADCConfiguration\.ps1'
         }
 
-        It 'Should source ActiveDirectory.ps1 in process block' {
+        It 'Should source ActiveDirectory.ps1' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
@@ -160,7 +161,7 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'ActiveDirectory\.ps1'
         }
 
-        It 'Should source Sync.ps1 in process block' {
+        It 'Should source Sync.ps1' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
@@ -168,7 +169,7 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'Sync\.ps1'
         }
 
-        It 'Should source Logfile.ps1 in process block' {
+        It 'Should source Logfile.ps1' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
@@ -176,28 +177,28 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'Logfile\.ps1'
         }
 
-        It 'Should call Import-Configuration' {
+        It 'Should call Import-TeamViewerADCConfiguration' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Import-Configuration'
+            $scriptContent | Should -Match 'Import-TeamViewerADCConfiguration'
         }
 
-        It 'Should call Confirm-Configuration' {
+        It 'Should call Test-TeamViewerADCConfiguration' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Confirm-Configuration'
+            $scriptContent | Should -Match 'Test-TeamViewerADCConfiguration'
         }
 
-        It 'Should call Invoke-Sync' {
+        It 'Should call Invoke-TeamViewerADCSync' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Invoke-Sync'
+            $scriptContent | Should -Match 'Invoke-TeamViewerADCSync'
         }
 
         It 'Should handle PassThru switch logic' {
@@ -216,20 +217,20 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'ShouldProcess'
         }
 
-        It 'Should call Format-SyncLog when not PassThru' {
+        It 'Should call Format-TeamViewerADCSyncLog when not PassThru' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Format-SyncLog'
+            $scriptContent | Should -Match 'Format-TeamViewerADCSyncLog'
         }
 
-        It 'Should call Out-TeamViewerADCLogfile for logging' {
+        It 'Should call Out-TeamViewerADCLogLine for logging' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Out-TeamViewerADCLogfile'
+            $scriptContent | Should -Match 'Out-TeamViewerADCLogLine'
         }
 
         It 'Should call Invoke-LogfileRotation for log rotation' {
@@ -240,7 +241,7 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'Invoke-LogfileRotation'
         }
 
-        It 'Should use Progress_Handler parameter in Invoke-Sync calls' {
+        It 'Should use Progress_Handler parameter in Invoke-TeamViewerADCSync calls' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
@@ -269,12 +270,12 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $missingParams | Should -BeNullOrEmpty
         }
 
-        It 'Should require Log_Basename parameter' {
+        It 'Should not require Log_Basename parameter when default is defined' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $param = $commandInfo.Parameters['Log_Basename']
             $isMandatory = $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and $_.Mandatory }
-            $isMandatory | Should -Not -BeNullOrEmpty
+            $isMandatory | Should -BeNullOrEmpty
         }
 
         It 'Should validate Log_Basename is not null or empty' {
@@ -288,12 +289,12 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
 
     Context 'Execution behavior validation' {
 
-        It 'Should have begin block defined' {
+        It 'Should not have begin block defined' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'begin\s*\{'
+            $scriptContent | Should -Not -Match 'begin\s*\{'
         }
 
         It 'Should use Log_Basename parameter in logging operations' {
@@ -304,7 +305,7 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'Log_Basename'
         }
 
-        It 'Should pass Log_Basename to Out-TeamViewerADCLogfile' {
+        It 'Should pass Log_Basename to Out-TeamViewerADCLogLine' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
@@ -327,7 +328,7 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
             # Should invoke sync and handle the results
-            $scriptContent | Should -Match 'Invoke-Sync'
+            $scriptContent | Should -Match 'Invoke-TeamViewerADCSync'
         }
     }
 }

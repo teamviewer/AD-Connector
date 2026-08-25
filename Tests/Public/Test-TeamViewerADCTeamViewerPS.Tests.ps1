@@ -29,7 +29,7 @@ Describe 'Test-TeamViewerADCTeamViewerPS' {
         It 'Should call Get-InstalledModule with correct parameters' {
             Test-TeamViewerADCTeamViewerPS
 
-            Assert-MockCalled -CommandName Get-InstalledModule -Times 1 -ParameterFilter {
+            Should -Invoke -CommandName Get-InstalledModule -Times 1 -Exactly -ParameterFilter {
                 $Name -eq 'TeamViewerPS' -and $ErrorAction -eq [System.Management.Automation.ActionPreference]::SilentlyContinue
             }
         }
@@ -65,7 +65,7 @@ Describe 'Test-TeamViewerADCTeamViewerPS' {
         It 'Should call Get-InstalledModule with correct parameters' {
             Test-TeamViewerADCTeamViewerPS
 
-            Assert-MockCalled -CommandName Get-InstalledModule -Times 1 -ParameterFilter {
+            Should -Invoke -CommandName Get-InstalledModule -Times 1 -Exactly -ParameterFilter {
                 $Name -eq 'TeamViewerPS' -and $ErrorAction -eq [System.Management.Automation.ActionPreference]::SilentlyContinue
             }
         }

@@ -15,7 +15,7 @@ function Invoke-TeamViewerADCTeamViewerPSInstallation {
         return $true
     }
     else {
-        Write-Verbose "PowerShell module '$TVPS_ModuleName' is not installed."
+        Write-Verbose "PowerShell module '$TVPS_ModuleName' is not installed!"
 
         try {
             Write-Verbose "PowerShell module '$TVPS_ModuleName' is being installed..."

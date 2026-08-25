@@ -3,7 +3,7 @@
     $scriptContent = Get-Content -Path $scriptPath -Raw
     $scriptContent = $scriptContent -replace '^#Requires\s+-RunAsAdministrator\s*\r?\n', ''
 
-    Invoke-Expression $scriptContent
+    . ([scriptblock]::Create($scriptContent))
 }
 
 Describe 'Invoke-TeamViewerADCConfiguration' {
@@ -86,12 +86,14 @@ Describe 'Invoke-TeamViewerADCConfiguration' {
     }
 
     Context 'Private script sourcing' {
-        It 'Should source Configuration.ps1 in process block' {
+        It 'Should source configuration helpers in process block' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCConfiguration
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Configuration\.ps1'
+            $scriptContent | Should -Match 'Import-TeamViewerADCConfiguration\.ps1'
+            $scriptContent | Should -Match 'Save-TeamViewerADCConfiguration\.ps1'
+            $scriptContent | Should -Match 'Test-TeamViewerADCConfiguration\.ps1'
         }
 
         It 'Should source ActiveDirectory.ps1 in process block' {
@@ -120,20 +122,20 @@ Describe 'Invoke-TeamViewerADCConfiguration' {
     }
 
     Context 'Function behavior validation' {
-        It 'Should call Import-Configuration' {
+        It 'Should call Import-TeamViewerADCConfiguration' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCConfiguration
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Import-Configuration'
+            $scriptContent | Should -Match 'Import-TeamViewerADCConfiguration'
         }
 
-        It 'Should call Confirm-Configuration' {
+        It 'Should call Test-TeamViewerADCConfiguration' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCConfiguration
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Confirm-Configuration'
+            $scriptContent | Should -Match 'Test-TeamViewerADCConfiguration'
         }
 
         It 'Should call Invoke-GraphicalUserInterfaceConfiguration' {
@@ -149,7 +151,7 @@ Describe 'Invoke-TeamViewerADCConfiguration' {
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Invoke-GraphicalUserInterfaceConfiguration\s+\$Config_Content'
+            $scriptContent | Should -Match 'Invoke-GraphicalUserInterfaceConfiguration\s+\$Configuration'
         }
 
         It 'Should pass Culture parameter to Invoke-GraphicalUserInterfaceConfiguration' {
@@ -160,21 +162,21 @@ Describe 'Invoke-TeamViewerADCConfiguration' {
             $scriptContent | Should -Match 'Invoke-GraphicalUserInterfaceConfiguration.*\$Culture'
         }
 
-        It 'Should use Config_File parameter with Import-Configuration' {
+        It 'Should use Config_File parameter with Import-TeamViewerADCConfiguration' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCConfiguration
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Import-Configuration.*Config_File'
+            $scriptContent | Should -Match 'Import-TeamViewerADCConfiguration.*Config_File'
         }
 
-        It 'Should have TODO comment about Confirm-Configuration necessity' {
+        It 'Should have TODO comment about Test-TeamViewerADCConfiguration necessity' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCConfiguration
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
             $scriptContent | Should -Match 'ToDo'
-            $scriptContent | Should -Match 'Confirm-Configuration'
+            $scriptContent | Should -Match 'Test-TeamViewerADCConfiguration'
         }
     }
 
@@ -261,8 +263,8 @@ Describe 'Invoke-TeamViewerADCConfiguration' {
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
             # Find positions of Import and Confirm
-            $importPos = $scriptContent.IndexOf('Import-Configuration')
-            $confirmPos = $scriptContent.IndexOf('Confirm-Configuration')
+            $importPos = $scriptContent.IndexOf('Import-TeamViewerADCConfiguration')
+            $confirmPos = $scriptContent.IndexOf('Test-TeamViewerADCConfiguration')
 
             # Import should come before Confirm
             $importPos | Should -BeLessThan $confirmPos
@@ -274,20 +276,19 @@ Describe 'Invoke-TeamViewerADCConfiguration' {
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
             # Find positions
-            $confirmPos = $scriptContent.IndexOf('Confirm-Configuration')
+            $confirmPos = $scriptContent.IndexOf('Test-TeamViewerADCConfiguration')
             $guiPos = $scriptContent.IndexOf('Invoke-GraphicalUserInterfaceConfiguration')
 
             # Confirm should come before GUI
             $confirmPos | Should -BeLessThan $guiPos
         }
 
-        It 'Should store configuration in Config_Content variable' {
+        It 'Should store configuration in Configuration variable' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCConfiguration
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Config_Content.*='
-            $scriptContent | Should -Match '\$Config_Content'
+            $scriptContent | Should -Match '\$Configuration\s*='
         }
     }
 

@@ -98,17 +98,19 @@ The script automatically asks for elevated rights (if required).
 
 ### Scheduled Task
 
-The scheduled task will be created with the specified interval as:
+Create the scheduled task with `New-TeamViewerADCScheduledTask`. It runs every 24 hours by default; use `-IntervalHours` to specify an interval between 1 and 24 hours.
+
+The scheduled task is registered as:
 
 ```powershell
-\TeamViewer\TeamViewer AD Connector
+\TeamViewerADC\Automatic Synchronization
 ```
 
-Output of the scheduled task is redirected to the configured log file location.
+The task runs the synchronization command as the `NETWORKSERVICE` account. Remove it with `Remove-TeamViewerADCScheduledTask`.
 
 ## Synchronization Logic
 
-The actual synchronization is done by the `Invoke-Sync.ps1` script in the `TeamViewerADConnector` directory using the following logic:
+The actual synchronization is done by the `Invoke-TeamViewerADCSync.ps1` script in the `TeamViewerADConnector` directory using the following logic:
 
 - Users of the configured Active Directory user group that are not yet part of the configured TeamViewer tenant / company (identified by the API token) will be created with the specified initial password.
 - Users of the configured Active Directory user group that are already part of the configured TeamViewer tenant / company will be activated and/or updated if the name of the user has been changed or the TeamViewer user is deactivated.

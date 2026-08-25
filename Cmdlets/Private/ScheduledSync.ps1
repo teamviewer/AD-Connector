@@ -1,5 +1,0 @@
-﻿. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-ScheduledSync.ps1')
-. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-ScheduledSyncInterval.ps1')
-. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-ScheduledSyncLogDirectory.ps1')
-. (Join-Path -Path $PSScriptRoot -ChildPath 'Install-ScheduledSync.ps1')
-. (Join-Path -Path $PSScriptRoot -ChildPath 'Uninstall-ScheduledSync.ps1')

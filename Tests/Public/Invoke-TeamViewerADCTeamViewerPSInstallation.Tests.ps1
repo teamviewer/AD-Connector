@@ -5,7 +5,7 @@
     $scriptContent = Get-Content -Path $scriptPath -Raw
     $scriptContent = $scriptContent -replace '^#Requires\s+-RunAsAdministrator\s*\r?\n', ''
 
-    Invoke-Expression $scriptContent
+    . ([scriptblock]::Create($scriptContent))
 }
 
 Describe 'Invoke-TeamViewerADCTeamViewerPSInstallation' {
@@ -32,8 +32,8 @@ Describe 'Invoke-TeamViewerADCTeamViewerPSInstallation' {
         It 'Should not call Install-Module' {
             Invoke-TeamViewerADCTeamViewerPSInstallation
 
-            Assert-MockCalled -CommandName Test-TeamViewerADCTeamViewerPS -Times 1
-            Assert-MockCalled -CommandName Install-Module -Times 0
+            Should -Invoke -CommandName Test-TeamViewerADCTeamViewerPS -Times 1 -Exactly
+            Should -Invoke -CommandName Install-Module -Times 0 -Exactly
         }
 
         It 'Should write verbose message indicating module is already installed' {
@@ -66,7 +66,7 @@ Describe 'Invoke-TeamViewerADCTeamViewerPSInstallation' {
         It 'Should call Install-Module with correct parameters' {
             Invoke-TeamViewerADCTeamViewerPSInstallation -Confirm:$false
 
-            Assert-MockCalled -CommandName Install-Module -Times 1 -ParameterFilter {
+            Should -Invoke -CommandName Install-Module -Times 1 -Exactly -ParameterFilter {
                 $Name -eq 'TeamViewerPS' -and
                 $Scope -eq 'AllUsers' -and
                 $Force -eq $true -and
@@ -108,7 +108,7 @@ Describe 'Invoke-TeamViewerADCTeamViewerPSInstallation' {
         It 'Should call Install-Module once before failing' {
             Invoke-TeamViewerADCTeamViewerPSInstallation -Confirm:$false
 
-            Assert-MockCalled -CommandName Install-Module -Times 1
+            Should -Invoke -CommandName Install-Module -Times 1 -Exactly
         }
 
         It 'Should write verbose error message when installation fails' {
@@ -129,9 +129,9 @@ Describe 'Invoke-TeamViewerADCTeamViewerPSInstallation' {
         }
 
         It 'Should not perform installation with -WhatIf' {
-            $result = Invoke-TeamViewerADCTeamViewerPSInstallation -WhatIf
+            Invoke-TeamViewerADCTeamViewerPSInstallation -WhatIf
 
-            Assert-MockCalled -CommandName Install-Module -Times 0
+            Should -Invoke -CommandName Install-Module -Times 0 -Exactly
         }
 
         It 'Should not return a value when -WhatIf is used' {

@@ -19,6 +19,10 @@ All public commands that help working with the TeamViewer Active Directory Conne
 
 [`Test-TeamViewerADCTeamViewerPS`](Help/Test-TeamViewerADCTeamViewerPS.md)
 
+[`New-TeamViewerADCScheduledTask`](Help/New-TeamViewerADCScheduledTask.md)
+
+[`Remove-TeamViewerADCScheduledTask`](Help/Remove-TeamViewerADCScheduledTask.md)
+
 # SEE ALSO
 
 TeamViewer Active Directory Connector on GitHub <https://github.com/teamviewer/AD-Connector>

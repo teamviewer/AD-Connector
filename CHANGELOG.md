@@ -1,5 +1,9 @@
 ﻿# Change Log
 
+## Unreleased
+
+- Added the `New-TeamViewerADCScheduledTask` command to create the automatic synchronization task.
+
 ## [2.0.0]
 
 - Imported TeamViewerPS module for API calls
