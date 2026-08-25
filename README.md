@@ -1,52 +1,54 @@
-# TeamViewer Active Directory Connector (AD Connector)
+﻿# TeamViewer Active Directory Connector (AD Connector)
 
-A PowerShell integration script to synchronize users of Active Directory (AD) groups to a [TeamViewer](https://www.teamviewer.com) company via REST based API.
+A collection of PowerShell scripts to synchronize users and user groups from Active Directory (AD) to a [TeamViewer](https://www.teamviewer.com) tenant / company via REST based API's.
+Targets Windows PowerShell 5.1 and PowerShell 6+ on Windows.
 
 <!--[+github]-->
 [![Build Status](https://github.com/teamviewer/AD-Connector/actions/workflows/ci.yml/badge.svg)](https://github.com/teamviewer/AD-Connector/actions/workflows/ci.yml)
 <!--[-github]-->
 
-Further information can be found in the knowledge base article "[Active Directory-Connector](https://community.teamviewer.com/English/kb/articles/31158-active-directory-connector-ad-connector)".
+Further information can be found in the knowledge base article "[Active Directory-Connector](https://www.teamviewer.com/en/global/support/knowledge-base/teamviewer-classic/integrations/core-integrations/active-directory-connector-ad-connector/?id=31158-active-directory-connector-ad-connector)".
 
 ## Download
 
-You can download the AD Connector package from [releases page](https://github.com/teamviewer/AD-Connector/releases).
+You can download the AD Connector package from [Github releases page](https://github.com/teamviewer/AD-Connector/releases).
 
 ## Configuration
 
-The script comes with a configuration interface that can be started by executing the `Invoke-Configuration.ps1` PowerShell script in the `TeamViewerADConnector` directory, or by double-clicking the `Configure TeamViewer AD Connector.bat` batch file.
+The script comes with a graphical configuration interface that can be started by executing the `Invoke-Configuration.ps1` PowerShell script in the `TeamViewerADConnector` directory, or by double-clicking the `Configure AD Connector.cmd` batch file.
 
-The graphical configuration provides the following features:
+The configuration provides the following features:
 
 - Validate the entered TeamViewer API token.
 - Show and adapt the synchronization configuration.
 - Manually trigger a run of the synchronization.
-- Install / uninstall a scheduled task to run the synchronization script automatically.
+- Install / uninstall a scheduled task to run the synchronization automatically.
 
-The graphical configuration requires to be run with elevated user rights to be able to install and uninstall the scheduled task.
+The configuration requires to be run with elevated user rights to be able to install and uninstall the scheduled task.
 The script automatically asks for elevated rights (if required).
 
 ### Configuration Parameters
 
 - Parameter `ApiToken`:
 
-  The TeamViewer API access token that is used for accessing the TeamViewer company user directory.
-  For more information on how to create such a token please visit: [TeamViewer for developers](https://www.teamviewer.com/en/for-developers/)
+  The TeamViewer API access token that is used for accessing the user / user group data on TeamViewer side.
+  For more information on how to create such a token please visit: [TeamViewer for developers](https://www.teamviewer.com/en/global/support/for-developers/)
 
   The TeamViewer API token requires the following access permissions:
 
-  - _User management_: _Create users, view users, edit users_ (corresponds to the WebAPI permissions `Users.CreateUsers`, `Users.Read`, `Users.ModifyUsers`)
-  - (optional) _Account management_: _View full profile_ (corresponds to the WebAPI permissions `Account.Read`, `Account.ReadEmail`. Used to skip possible deactivation of API token owner.)
+  - _User management_: _Create users, view users, edit users_ (corresponds to the web API permissions `Users.CreateUsers`, `Users.Read`, `Users.ModifyUsers`)
+  - (optional) _Account management_: _View full profile_ (corresponds to the web API permissions `Account.Read`, `Account.ReadEmail`. Used to skip possible deactivation of API token owner.)
   - (optional) _Group management_: _View, create, delete, edit and share groups_
-  - (optional) _User Group management_: _View, create, delete and edit groups_. Required when user group synchronization is enabled.
+  - (optional) _User group management_: _View, create, delete and edit groups_. Required when user group synchronization is enabled.
 
 - Parameter `ActiveDirectoryGroups`:
 
-  The LDAP identifiers (without the leading `LDAP://` protocol scheme) of the AD groups used for the synchronization.
+  The LDAP identifiers (without the leading `LDAP://` protocol scheme) of the Active Directory user groups used for the synchronization.
 
 - Parameter `UserLanguage`:
 
-  The two-letter language identifier used as default language for newly created TeamViewer users. For example it is used to localize the "User Welcome" email.
+  The two-letter language identifier used as default language for newly created TeamViewer users.
+  For example it is used to localize the "User welcome" email.
 
 - Parameter `UseDefaultPassword`:
 
@@ -59,7 +61,8 @@ The script automatically asks for elevated rights (if required).
 
 - Parameter `UseSsoCustomerId`:
 
-  If set to `true` TeamViewer users will be created having Single Sign-On (SSO) already activated. Therefore a customer ID needs to be specified in the `SsoCustomerId` parameter.
+  If set to `true` TeamViewer users will be created having Single Sign-On (SSO) already activated.
+  Therefore a customer ID needs to be specified in the `SsoCustomerId` parameter.
   This parameter cannot be used in conjunction with the `UseDefaultPassword` or `UseGeneratedPassword` parameters.
 
 - Parameter `SsoCustomerId`:
@@ -77,19 +80,19 @@ The script automatically asks for elevated rights (if required).
 
 - Parameter `DeactivateUsers`:
 
-  If set to `true` TeamViewer users that are not member of the selected AD group will be disabled.
+  If set to `true` TeamViewer users that are not member of the selected Active Directory user group will be disabled.
 
 - Parameter `RecursiveGroups`:
 
-  If set to `true` users of nested AD groups will be included.
+  If set to `true` users of nested Active Directory user groups will be included.
 
 - Parameter `UseSecondaryEmails`:
 
-  If set to `true` the secondary email addresses configured for an AD user will also be taken into account when trying to map to a TeamViewer user.
+  If set to `true` the secondary email addresses configured for an Active Directory user will also be taken into account when trying to map to a TeamViewer user.
 
 - Parameter `EnableUserGroupsSync`:
 
-  If set to `true` the script attempts to synchronize the given AD groups and their respective users with the TeamViewer user groups.
+  If set to `true` the script attempts to synchronize the given Active Directory user groups and their respective users with the TeamViewer user groups.
   Those user groups can then be used to configure TeamViewer functionality, for example: Single Sign-On ownership or exclusions.
   The user groups synchronization step runs after the user sync. This option requires the API token to have additional permissions, see point `ApiToken` above.
 
@@ -107,14 +110,14 @@ Output of the scheduled task is redirected to the configured log file location.
 
 The actual synchronization is done by the `Invoke-Sync.ps1` script in the `TeamViewerADConnector` directory using the following logic:
 
-- Users of the configured AD group that are not yet part of the configured TeamViewer company (identified by the API token) will be created with the specified initial password.
-- Users of the configured AD group that are already part of the configured TeamViewer company will be activated and/or updated if the name of the user has been changed or the TeamViewer user is deactivated.
-- If configured, users of the TeamViewer company that are not present in the configured AD group will be deactivated.
+- Users of the configured Active Directory user group that are not yet part of the configured TeamViewer tenant / company (identified by the API token) will be created with the specified initial password.
+- Users of the configured Active Directory user group that are already part of the configured TeamViewer tenant / company will be activated and/or updated if the name of the user has been changed or the TeamViewer user is deactivated.
+- If configured, users of the TeamViewer tenant / company that are not present in the configured Active Directory user group will be deactivated.
 
-Identification of users is done based on the email addresses. If configured, the secondary email addresses of AD users are also taken into account for the mapping between AD users and TeamViewer users.
+Identification of users is done based on the email addresses. If configured, the secondary email addresses of Active Directory users are also taken into account for the mapping between Active Directory users and TeamViewer users.
 
 ## License
 
-Copyright (c) 2018-2023 TeamViewer Germany GmbH
+Copyright (c) 2018-2026 TeamViewer Germany GmbH
 
 See file `LICENSE`.

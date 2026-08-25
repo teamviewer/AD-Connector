@@ -2,9 +2,14 @@
     // Place your settings in this file to overwrite default and user settings.
     "editor.formatOnSave": true,
     "files.eol": "\r\n",
-    "files.encoding": "utf8",
+    "files.encoding": "utf8bom",
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,
+    "[markdown]": {
+        "editor.tabSize": 2,
+        "editor.trimAutoWhitespace": false,
+        "files.trimTrailingWhitespace": false
+    },
     "powershell.codeFolding.showLastLine": false,
     "powershell.buttons.showPanelMovementButtons": true,
     "powershell.codeFormatting.preset": "Stroustrup",
@@ -25,18 +30,19 @@
     "powershell.codeFormatting.whitespaceBeforeOpenParen": true,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
     "powershell.codeFormatting.whitespaceInsideBrace": true,
-    "[markdown]": {
-        "editor.tabSize": 2,
-        "editor.trimAutoWhitespace": false,
-        "files.trimTrailingWhitespace": false
-    },
-    "markdownlint.config": {
-        "MD009": false,
-        "MD024": false,
-        "MD025": false,
-        "MD028": false
-    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
     "[yaml]": {
         "editor.tabSize": 2
-    }
+    },
+    "markdownlint.configFile": "${workspaceFolder}/.vscode/.markdownlint.json",
+    "cSpell.dictionaryDefinitions": [
+        {
+            "name": "ProjectDictionary",
+            "path": "${workspaceRoot}/.vscode/.spelling"
+        }
+    ],
+    "cSpell.dictionaries": [
+        "ProjectDictionary"
+    ],
+    "cSpell.language": "en"
 }

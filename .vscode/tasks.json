@@ -5,13 +5,44 @@
         {
             "label": "Lint (via PSScriptAnalyzer)",
             "type": "shell",
-            "command": "Invoke-ScriptAnalyzer -Path '${workspaceFolder}' -Settings '${workspaceFolder}/PSScriptAnalyzerSettings.psd1' -Severity Information, Warning, Error -ExcludeRule PSReviewUnusedParameter -Recurse",
+            "command": "& Invoke-ScriptAnalyzer -Path \\\"${workspaceFolder}\\\" -Recurse -Settings \\\"${workspaceFolder}/Linters/PSScriptAnalyzer.psd1\\\"",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Test (via Pester)",
+            "type": "shell",
+            "command": "& Invoke-Pester -Path \\\"${workspaceFolder}\\\"",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "Invoke-Build -Task Clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "Invoke-Build -Task Build",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "presentation": {
-                "reveal": "always"
+            "problemMatcher": []
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "Invoke-Build -Task Test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
             },
             "problemMatcher": []
         }

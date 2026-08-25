@@ -1,4 +1,4 @@
----
+﻿---
 name: Bug Report
 about: Create a bug report
 title: "[Bug] "
@@ -15,6 +15,7 @@ Describe what you expected to happen.
 
 **Setps To Reproduce**
 Describe the steps to reproduce the behavior:
+
 1. Configure '...' with value '...'
 2. Execute with "..."
 3. See error ...

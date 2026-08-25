@@ -1,21 +1,26 @@
 {
-    // See https://go.microsoft.com/fwlink/?linkid=830387 for the documentation about the launch.json format
+    // See https://go.microsoft.com/fwlink/?linkid=830387 for the documentation about the tasks.json format
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "Lint (via PSScriptAnalyzer)",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Invoke-ScriptAnalyzer -Path '${workspaceFolder}' -Recurse -Settings '${workspaceFolder}/Linters/PSScriptAnalyzer.psd1'",
+            "createTemporaryIntegratedConsole": true
+        },
         {
             "name": "Test (via Pester)",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Invoke-Pester",
-            "args": [
-                "-Path '${workspaceFolder}' -Output Detailed"
-            ]
+            "script": "Invoke-Pester -Path '${workspaceFolder}'",
+            "createTemporaryIntegratedConsole": true
         },
         {
             "name": "Run (via PowerShell)",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Start-Process -FilePath '${workspaceFolder}/Configure TeamViewer AD Connector.bat' -WorkingDirectory '${workspaceFolder}' -Wait",
+            "script": "Start-Process -FilePath '${workspaceFolder}/Configure AD Connector.cmd' -WorkingDirectory '${workspaceFolder}' -Wait",
             "args": []
         }
     ]

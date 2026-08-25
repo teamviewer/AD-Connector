@@ -1,4 +1,4 @@
-
+﻿
 function Select-StringExcludeBlock {
     Param(
         [Parameter(Mandatory = $true)]
