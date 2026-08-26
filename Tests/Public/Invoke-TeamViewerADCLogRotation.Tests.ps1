@@ -4,45 +4,45 @@
 
 Describe 'Invoke-TeamViewerADCLogRotation' {
     Context 'Parameter validation' {
-        It 'Should have optional Log_Directory parameter' {
+        It 'Should have optional Directory parameter' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Directory']
+            $param = $commandInfo.Parameters['Directory']
 
             $param | Should -Not -BeNullOrEmpty
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and -not $_.Mandatory } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should have optional Log_Basename parameter' {
+        It 'Should have optional Basename parameter' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Basename']
+            $param = $commandInfo.Parameters['Basename']
 
             $param | Should -Not -BeNullOrEmpty
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and -not $_.Mandatory } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should have optional Log_Retention parameter' {
+        It 'Should have optional Retention parameter' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Retention']
+            $param = $commandInfo.Parameters['Retention']
 
             $param | Should -Not -BeNullOrEmpty
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and -not $_.Mandatory } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Log_Directory should validate path exists and is a container' {
+        It 'Directory should validate path exists and is a container' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Directory']
+            $param = $commandInfo.Parameters['Directory']
 
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateScriptAttribute] } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Log_Basename should validate not null or empty' {
+        It 'Basename should validate not null or empty' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Basename']
+            $param = $commandInfo.Parameters['Basename']
 
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateNotNullOrEmptyAttribute] } | Should -Not -BeNullOrEmpty
         }
@@ -50,7 +50,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
         It 'Retention should validate minimum value of 1' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Retention']
+            $param = $commandInfo.Parameters['Retention']
 
             $validateRange = $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateRangeAttribute] }
             $validateRange | Should -Not -BeNullOrEmpty
@@ -95,7 +95,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
             $scriptContent | Should -Match 'Get-ChildItem'
-            $scriptContent | Should -Match '\$Log_Basename\*\.log'
+            $scriptContent | Should -Match '\$Basename\*\.log'
         }
 
         It 'Should filter for .log files only' {
@@ -118,12 +118,12 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             $scriptContent | Should -Match 'FullName'
         }
 
-        It 'Should use Log_Directory parameter in path construction' {
+        It 'Should use Directory parameter in path construction' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match '\$Log_Directory'
+            $scriptContent | Should -Match '\$Directory'
         }
 
         It 'Should store files in Log_Files variable' {
@@ -141,7 +141,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'if.*\$Log_Files\.Count.*-gt.*\$Log_Retention'
+            $scriptContent | Should -Match 'if.*\$Log_Files\.Count.*-gt.*\$Retention'
         }
 
         It 'Should use Remove-Item for deletion' {
@@ -167,7 +167,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
             # Should subtract Retention from total count
-            $scriptContent | Should -Match '\$Log_Files\.Count\s*-\s*\$Log_Retention\s*-\s*1'
+            $scriptContent | Should -Match '\$Log_Files\.Count\s*-\s*\$Retention\s*-\s*1'
         }
 
         It 'Should use ErrorAction Stop for Remove-Item' {
@@ -206,7 +206,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             # Create some test log files
             1..3 | ForEach-Object { New-Item -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename$_.log") -ItemType File -Force | Out-Null }
 
-            { Invoke-TeamViewerADCLogRotation -Log_Directory $script:TestLogDirectory -Log_Basename $basename -Log_Retention $Retention } | Should -Not -Throw
+            { Invoke-TeamViewerADCLogRotation -Directory $script:TestLogDirectory -Basename $basename -Retention $Retention } | Should -Not -Throw
         }
 
         It 'Should not delete files when count equals retention' {
@@ -216,7 +216,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             # Create exactly 3 log files
             1..3 | ForEach-Object { New-Item -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename$_.log") -ItemType File -Force | Out-Null }
 
-            Invoke-TeamViewerADCLogRotation -Log_Directory $script:TestLogDirectory -Log_Basename $basename -Log_Retention $Retention
+            Invoke-TeamViewerADCLogRotation -Directory $script:TestLogDirectory -Basename $basename -Retention $Retention
 
             # Should still have all 3 files
             $files = Get-ChildItem -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename*.log") -File
@@ -230,7 +230,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             # Create only 3 log files
             1..3 | ForEach-Object { New-Item -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename$_.log") -ItemType File -Force | Out-Null }
 
-            Invoke-TeamViewerADCLogRotation -Log_Directory $script:TestLogDirectory -Log_Basename $basename -Log_Retention $Retention
+            Invoke-TeamViewerADCLogRotation -Directory $script:TestLogDirectory -Basename $basename -Retention $Retention
 
             # Should still have all 3 files
             $files = Get-ChildItem -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename*.log") -File
@@ -250,7 +250,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
                 (Get-Item -Path $filePath).LastWriteTime = (Get-Date).AddSeconds(-$_)
             }
 
-            Invoke-TeamViewerADCLogRotation -Log_Directory $script:TestLogDirectory -Log_Basename $basename -Log_Retention $Retention
+            Invoke-TeamViewerADCLogRotation -Directory $script:TestLogDirectory -Basename $basename -Retention $Retention
 
             # Should have only 2 files remaining (the newest ones)
             $files = Get-ChildItem -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename*.log") -File
@@ -272,7 +272,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
                 $item.LastWriteTime = (Get-Date).AddSeconds(-$_)
             }
 
-            Invoke-TeamViewerADCLogRotation -Log_Directory $script:TestLogDirectory -Log_Basename $basename -Log_Retention $Retention
+            Invoke-TeamViewerADCLogRotation -Directory $script:TestLogDirectory -Basename $basename -Retention $Retention
 
             # Should have exactly 2 files remaining (the newest ones)
             $remainingFiles = Get-ChildItem -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "${basename}*.log") -File
@@ -286,7 +286,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             # Create 1 log file
             New-Item -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename`1.log") -ItemType File -Force | Out-Null
 
-            { Invoke-TeamViewerADCLogRotation -Log_Directory $script:TestLogDirectory -Log_Basename $basename -Log_Retention $Retention } | Should -Not -Throw
+            { Invoke-TeamViewerADCLogRotation -Directory $script:TestLogDirectory -Basename $basename -Retention $Retention } | Should -Not -Throw
 
             # Should still have 1 file
             $files = Get-ChildItem -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename*.log") -File
@@ -298,7 +298,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             $Retention = 5
 
             # No log files created
-            { Invoke-TeamViewerADCLogRotation -Log_Directory $script:TestLogDirectory -Log_Basename $basename -Log_Retention $Retention } | Should -Not -Throw
+            { Invoke-TeamViewerADCLogRotation -Directory $script:TestLogDirectory -Basename $basename -Retention $Retention } | Should -Not -Throw
 
             # Should have 0 files
             $files = Get-ChildItem -Path (Join-Path -Path $script:TestLogDirectory -ChildPath "$basename*.log") -File -ErrorAction SilentlyContinue
@@ -311,7 +311,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
             # Retention should accept minimum value of 1
-            $param = $commandInfo.Parameters['Log_Retention']
+            $param = $commandInfo.Parameters['Retention']
 
             $validateRange = $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateRangeAttribute] }
             $validateRange.MinRange | Should -Be 1
@@ -320,25 +320,25 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
         It 'Should accept large Retention values' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Retention']
+            $param = $commandInfo.Parameters['Retention']
 
             $validateRange = $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateRangeAttribute] }
             $validateRange.MaxRange | Should -Be ([int]::MaxValue)
         }
 
-        It 'Should accept empty Log_Basename if wrapped in quotes' {
+        It 'Should accept empty Basename if wrapped in quotes' {
             # This test validates that the parameter accepts strings
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            $param = $commandInfo.Parameters['Log_Basename']
+            $param = $commandInfo.Parameters['Basename']
             $param.ParameterType.Name | Should -Be 'String'
         }
 
-        It 'Should accept Log_Basename with special characters' {
+        It 'Should accept Basename with special characters' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCLogRotation
 
-            # Log_Basename is just a string, so it should accept any non-null value
-            $param = $commandInfo.Parameters['Log_Basename']
+            # Basename is just a string, so it should accept any non-null value
+            $param = $commandInfo.Parameters['Basename']
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateNotNullOrEmptyAttribute] } | Should -Not -BeNullOrEmpty
         }
     }
@@ -357,7 +357,7 @@ Describe 'Invoke-TeamViewerADCLogRotation' {
 
     Context 'Execution guarantees' {
         It 'Should have no output' {
-            $result = @(Invoke-TeamViewerADCLogRotation -Log_Directory $TestDrive -Log_Basename 'NoFiles_' -Log_Retention 1)
+            $result = @(Invoke-TeamViewerADCLogRotation -Directory $TestDrive -Basename 'NoFiles_' -Retention 1)
 
             $result | Should -BeNullOrEmpty
         }

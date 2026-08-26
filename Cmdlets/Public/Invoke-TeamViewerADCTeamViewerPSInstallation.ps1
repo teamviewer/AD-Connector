@@ -1,6 +1,4 @@
-﻿#Requires -RunAsAdministrator
-
-function Invoke-TeamViewerADCTeamViewerPSInstallation {
+﻿function Invoke-TeamViewerADCTeamViewerPSInstallation {
     [CmdletBinding(SupportsShouldProcess = $true)]
 
     [OutputType([bool])]

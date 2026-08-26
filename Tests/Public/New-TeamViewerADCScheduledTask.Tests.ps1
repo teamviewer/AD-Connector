@@ -1,11 +1,11 @@
 ﻿BeforeAll {
-    . "$PSScriptRoot\..\..\Cmdlets\Private\Get-TeamViewerADCScheduledTask.ps1"
+    . "$PSScriptRoot\..\..\Cmdlets\Private\Get-TVADCScheduledTask.ps1"
     . "$PSScriptRoot\..\..\Cmdlets\Public\New-TeamViewerADCScheduledTask.ps1"
 }
 
 Describe 'New-TeamViewerADCScheduledTask' {
     BeforeEach {
-        Mock Get-TeamViewerADCScheduledTask { return $null }
+        Mock Get-TVADCScheduledTask { return $null }
         Mock New-ScheduledTaskAction { return 'Action' }
         Mock New-ScheduledTaskTrigger { return 'Trigger' }
         Mock New-ScheduledTaskPrincipal { return 'Principal' }
@@ -45,7 +45,7 @@ Describe 'New-TeamViewerADCScheduledTask' {
     It 'returns the existing scheduled task without registering another one' {
         $ScheduledTask = [pscustomobject]@{ TaskName = 'Automatic Synchronization' }
 
-        Mock Get-TeamViewerADCScheduledTask { return $ScheduledTask }
+        Mock Get-TVADCScheduledTask { return $ScheduledTask }
 
         $Result = New-TeamViewerADCScheduledTask
 

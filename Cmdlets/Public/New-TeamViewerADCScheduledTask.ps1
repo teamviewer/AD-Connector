@@ -9,7 +9,7 @@
         [int]$Interval = 24
     )
 
-    $ScheduledTask = Get-TeamViewerADCScheduledTask
+    $ScheduledTask = Get-TVADCScheduledTask
 
     if ($ScheduledTask) {
         return $ScheduledTask

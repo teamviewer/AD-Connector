@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Formatting views for TeamViewerADC.* typed objects.
+    Add <View> definitions here as typed converters are introduced.
+-->
+<Configuration>
+    <ViewDefinitions>
+    </ViewDefinitions>
+</Configuration>

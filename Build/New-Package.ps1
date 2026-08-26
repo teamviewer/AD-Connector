@@ -1,46 +1,60 @@
-﻿param(
-    [Parameter(Mandatory = $true)]
-    [String] $Path,
+﻿#requires -Modules BuildHelpers, platyPS
 
-    [Parameter(Mandatory = $true)]
-    [String] $Destination,
+param(
+    [Parameter()]
+    [string]$Build_OutputPath = "$(Resolve-Path "$PSScriptRoot\..")\Build\TeamViewerADC",
 
-    [Parameter(Mandatory = $true)]
-    [String] $Version
+    [Parameter()]
+    [version]$Module_Version
 )
 
-$script:ErrorActionPreference = 'Stop'
-$global:ProgressPreference = 'SilentlyContinue'
-Add-Type -assembly 'system.io.compression.filesystem'
+$Repo_RootPath = Resolve-Path -Path "$PSScriptRoot\.."
+$Repo_CmdletPath = Resolve-Path -Path "$PSScriptRoot\..\Cmdlets"
 
-$Path = (Resolve-Path $Path)
-Push-Location -Path $Path
-$temporaryDirectory = (Join-Path ([System.IO.Path]::GetTempPath()) ([string][System.Guid]::NewGuid()))
-(New-Item -ItemType Directory -Path $temporaryDirectory) | Out-Null
+if (Test-Path -Path $Build_OutputPath) {
+    Write-Verbose 'Removing existing build output directory...'
+    Remove-Item -Path $Build_OutputPath -Recurse -ErrorAction SilentlyContinue
+}
 
-. .\Build\Select-StringExcludeBlock.ps1
+Write-Verbose 'Creating build output directories...'
+New-Item -Type Directory $Build_OutputPath | Out-Null
 
-# Markdown Readme File
-$markdownReadmeFile = (Join-Path $temporaryDirectory README.md)
-Get-Content ./README.md | Select-StringExcludeBlock -Begin '[+github]' -End '[-github]' | Set-Content $markdownReadmeFile
+# Compile all functions into a single psm file
+$Build_ModulePath = (Join-Path -Path $Build_OutputPath -ChildPath 'TeamViewerADC.psm1')
 
-# HTML Readme File
-ConvertTo-Html `
-    -Title (Get-Content $markdownReadmeFile -First 1).Trim('# ') `
-    -PreContent (Get-Content ./Build/README.style.html | Out-String) `
-    -Body (Get-Content $markdownReadmeFile | Out-String | ConvertFrom-Markdown).Html | `
-    Set-Content (Join-Path $temporaryDirectory README.html)
+Write-Verbose 'Compiling single-file TeamViewer module...'
 
-# Prepare package files
-Copy-Item ./TeamViewerADConnector -Destination $temporaryDirectory -Recurse
-Copy-Item ./LICENSE.txt -Destination $temporaryDirectory
-Copy-Item ./*.bat -Destination $temporaryDirectory
+$PrivateFunctions = @(Get-ChildItem -Path (Join-Path -Path $Repo_CmdletPath -ChildPath 'Private\*.ps1') -ErrorAction SilentlyContinue)
+Write-Verbose "Found $($PrivateFunctions.Count) private function files."
 
-# Set script version
-(Get-ChildItem -Recurse $temporaryDirectory/**/*.ps1) | ForEach-Object { (Get-Content $_) | ForEach-Object { $_ -replace '{ScriptVersion}', "$Version" } | Set-Content $_ }
+$PublicFunctions = @(Get-ChildItem -Path (Join-Path -Path $Repo_CmdletPath -ChildPath 'Public\*.ps1') -ErrorAction SilentlyContinue)
+Write-Verbose "Found $($PublicFunctions.Count) public function files."
 
-# Compress package
-Compress-Archive -Force -Path $temporaryDirectory/* -DestinationPath $Destination
+@($PrivateFunctions + $PublicFunctions) | Get-Content -Raw | ForEach-Object { $_; "`r`n" } | Set-Content -Path $Build_ModulePath -Encoding UTF8
 
-Remove-Item $temporaryDirectory -Force -Recurse -ErrorAction SilentlyContinue
+# Create help from markdown
+Write-Verbose 'Building help from Markdown...'
+New-ExternalHelp -Path (Join-Path -Path $Repo_RootPath -ChildPath 'Docs') -OutputPath (Join-Path -Path $Build_OutputPath -ChildPath 'en-US') | Out-Null
+New-ExternalHelp -Path (Join-Path -Path $Repo_RootPath -ChildPath 'Docs\Help') -OutputPath (Join-Path -Path $Build_OutputPath -ChildPath 'en-US') | Out-Null
+
+# Create module manifest
+Write-Verbose 'Creating module manifest...'
+Copy-Item -Path (Join-Path -Path $Repo_CmdletPath -ChildPath 'TeamViewerADC.psd1') -Destination $Build_OutputPath
+Copy-Item -Path (Join-Path -Path $Repo_CmdletPath -ChildPath '*.format.ps1xml') -Destination $Build_OutputPath
+
+Update-Metadata -Path (Join-Path -Path $Build_OutputPath -ChildPath 'TeamViewerADC.psd1') -PropertyName 'FunctionsToExport' -Value $PublicFunctions.BaseName
+
+if ($PSBoundParameters.ContainsKey('Module_Version')) {
+    Update-Metadata -Path (Join-Path -Path $Build_OutputPath -ChildPath 'TeamViewerADC.psd1') -PropertyName 'ModuleVersion' -Value $Module_Version
+}
+
+# Copy additional package files
+Write-Verbose 'Copying additional files into the package...'
+Copy-Item -Path (Join-Path -Path $Repo_RootPath -ChildPath 'CHANGELOG.md') -Destination "$Build_OutputPath"
+Copy-Item -Path (Join-Path -Path $Repo_RootPath -ChildPath 'LICENSE.md') -Destination "$Build_OutputPath"
+Copy-Item -Path (Join-Path -Path $Repo_RootPath -ChildPath 'README.md') -Destination "$Build_OutputPath"
+
+Write-Verbose 'Listing package files:'
+Push-Location -Path $Build_OutputPath
+Get-ChildItem -Path "$Build_OutputPath\" -Recurse | Sort-Object -Property FullName | Resolve-Path -Relative
 Pop-Location

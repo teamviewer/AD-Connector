@@ -4,7 +4,7 @@ Comprehensive guidance for AI coding agents and developers working in this repos
 
 ## Project Overview
 
-A collection of PowerShell scripts to synchronize users and user groups from Active Directory (AD) to a [TeamViewer](https://www.teamviewer.com) tenant / company via REST based API's.
+A PowerShell module to synchronize users and user groups from Active Directory (AD) to a [TeamViewer](https://www.teamviewer.com) tenant / company via REST based API's.
 Targets Windows PowerShell 5.1 and PowerShell 6+ on Windows.
 
 | Path | Purpose |
@@ -22,7 +22,6 @@ Run commands from the repository root:
 ```powershell
 Invoke-ScriptAnalyzer -Path . -Recurse -Settings .\Linters\PSScriptAnalyzer.psd1
 Invoke-Pester -Path .
-Invoke-Build -Task Build
 ```
 
 - Do not hardcode tokens, credentials, or machine-specific values.
@@ -33,12 +32,14 @@ Invoke-Build -Task Build
 
 - Use Microsoft approved PowerShell verbs <https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.6> and PascalCase function names.
 - Use PascalCase variable names. The use of Underscore is allowed.
-- Public cmdlets use the `TeamViewer` noun prefix. Private mappers use `ConvertTo-*`; identifier lookups use `Resolve-*`.
+- Public cmdlets use the `TeamViewerADC` noun prefix.
+- Private functions use the shorter `TVADC` noun prefix (for example `Get-TVADCScheduledTask`).
+- Private mappers use `ConvertTo-*`; identifier lookups use `Resolve-*`.
 - Use `[CmdletBinding()]` for public cmdlets. Add `SupportsShouldProcess = $true` for mutating commands that call `ShouldProcess`.
 - Add an empty `param()` block to parameterless advanced functions.
 - Use `begin`, `process`, and `end` only when their lifecycle behavior is useful.
 - Use `return` for control flow. Emit pipeline output intentionally; use `Write-Output` where explicit output improves clarity, especially in `process` blocks.
-- Declare `[OutputType()]` when the public output contract is clear. Match it to runtime output and the help file's `OUTPUTS` section. Use CLR types for primitive values, `[void]` for no output, and existing `TeamViewerPS.*` types for converted objects.
+- Declare `[OutputType()]` when the public output contract is clear. Match it to runtime output and the help file's `OUTPUTS` section. Use CLR types for primitive values, `[void]` for no output, and existing `TeamViewerADC.*` types for converted objects.
 - Use named parameters in all function calls.
 
 ## Parameters And Input

@@ -1,6 +1,6 @@
-﻿# TeamViewer Active Directory Connector (AD Connector)
+﻿# TeamViewer Active Directory Connector (AD Connector, ADC)
 
-A collection of PowerShell scripts to synchronize users and user groups from Active Directory (AD) to a [TeamViewer](https://www.teamviewer.com) tenant / company via REST based API's.
+A PowerShell module to synchronize users and user groups from Active Directory (AD) to a [TeamViewer](https://www.teamviewer.com) tenant / company via REST based API's.
 Targets Windows PowerShell 5.1 and PowerShell 6+ on Windows.
 
 <!--[+github]-->
@@ -11,11 +11,40 @@ Further information can be found in the knowledge base article "[Active Director
 
 ## Download
 
-You can download the AD Connector package from [Github releases page](https://github.com/teamviewer/AD-Connector/releases).
+You can download the AD Connector package from the [GitHub releases page](https://github.com/teamviewer/AD-Connector/releases).
+The package contains the `TeamViewerADC` module folder.
+
+## Prerequisites
+
+The AD Connector requires the [TeamViewerPS](https://github.com/teamviewer/TeamViewerPS) module for the TeamViewer web API calls.
+Install it with `Invoke-TeamViewerADCTeamViewerPSInstallation` (or check its presence with `Test-TeamViewerADCTeamViewerPS`).
+
+## Installation
+
+Extract the downloaded package to a writable location and import the module:
+
+```powershell
+Import-Module .\TeamViewerADC\TeamViewerADC.psd1
+```
+
+List the available commands and their help:
+
+```powershell
+Get-Command -Module TeamViewerADC
+Get-Help -Full Invoke-TeamViewerADCSynchronization
+```
+
+The module exports the following commands:
+
+- `Invoke-TeamViewerADCConfiguration` - graphical configuration interface.
+- `Invoke-TeamViewerADCSynchronization` - run the synchronization.
+- `Invoke-TeamViewerADCLogRotation` - rotate the synchronization log files.
+- `Invoke-TeamViewerADCTeamViewerPSInstallation` / `Test-TeamViewerADCTeamViewerPS` - manage the TeamViewerPS dependency.
+- `New-TeamViewerADCScheduledTask` / `Remove-TeamViewerADCScheduledTask` - manage the automatic synchronization task.
 
 ## Configuration
 
-The script comes with a graphical configuration interface that can be started by executing the `Invoke-Configuration.ps1` PowerShell script in the `TeamViewerADConnector` directory, or by double-clicking the `Configure AD Connector.cmd` batch file.
+The module comes with a graphical configuration interface that can be started with the `Invoke-TeamViewerADCConfiguration` command.
 
 The configuration provides the following features:
 
@@ -25,7 +54,7 @@ The configuration provides the following features:
 - Install / uninstall a scheduled task to run the synchronization automatically.
 
 The configuration requires to be run with elevated user rights to be able to install and uninstall the scheduled task.
-The script automatically asks for elevated rights (if required).
+Start PowerShell as administrator before running `Invoke-TeamViewerADCConfiguration`.
 
 ### Configuration Parameters
 
@@ -110,7 +139,7 @@ The task runs the synchronization command as the `NETWORKSERVICE` account. Remov
 
 ## Synchronization Logic
 
-The actual synchronization is done by the `Invoke-TeamViewerADCSync.ps1` script in the `TeamViewerADConnector` directory using the following logic:
+The actual synchronization is done by the `Invoke-TeamViewerADCSynchronization` command using the following logic:
 
 - Users of the configured Active Directory user group that are not yet part of the configured TeamViewer tenant / company (identified by the API token) will be created with the specified initial password.
 - Users of the configured Active Directory user group that are already part of the configured TeamViewer tenant / company will be activated and/or updated if the name of the user has been changed or the TeamViewer user is deactivated.

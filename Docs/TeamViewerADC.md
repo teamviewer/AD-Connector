@@ -15,6 +15,10 @@ All public commands that help working with the TeamViewer Active Directory Conne
 
 [`Invoke-TeamViewerADCConfiguration`](Help/Invoke-TeamViewerADCConfiguration.md)
 
+[`Invoke-TeamViewerADCSynchronization`](Help/Invoke-TeamViewerADCSynchronization.md)
+
+[`Invoke-TeamViewerADCLogRotation`](Help/Invoke-TeamViewerADCLogRotation.md)
+
 [`Invoke-TeamViewerADCTeamViewerPSInstallation`](Help/Invoke-TeamViewerADCTeamViewerPSInstallation.md)
 
 [`Test-TeamViewerADCTeamViewerPS`](Help/Test-TeamViewerADCTeamViewerPS.md)

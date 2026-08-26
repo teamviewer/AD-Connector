@@ -9,23 +9,23 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $commandInfo.Parameters['Config_File'] | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should have Log_Directory parameter' {
+        It 'Should have Directory parameter' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
-            $commandInfo.Parameters['Log_Directory'] | Should -Not -BeNullOrEmpty
+            $commandInfo.Parameters['Directory'] | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should have Log_Retention parameter with default value 16' {
+        It 'Should have Retention parameter with default value 16' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
-            $param = $commandInfo.Parameters['Log_Retention']
+            $param = $commandInfo.Parameters['Retention']
             $param | Should -Not -BeNullOrEmpty
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateRangeAttribute] } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should have optional Log_Basename parameter' {
+        It 'Should have optional Basename parameter' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
-            $param = $commandInfo.Parameters['Log_Basename']
+            $param = $commandInfo.Parameters['Basename']
             $param | Should -Not -BeNullOrEmpty
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and $_.Mandatory } | Should -BeNullOrEmpty
         }
@@ -53,17 +53,17 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateScriptAttribute] } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Log_Directory should have ValidateScript attribute' {
+        It 'Directory should have ValidateScript attribute' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
-            $param = $commandInfo.Parameters['Log_Directory']
+            $param = $commandInfo.Parameters['Directory']
             $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateScriptAttribute] } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Log_Retention should validate minimum value of 1' {
+        It 'Retention should validate minimum value of 1' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
-            $param = $commandInfo.Parameters['Log_Retention']
+            $param = $commandInfo.Parameters['Retention']
 
             $validateRange = $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateRangeAttribute] }
             $validateRange.MinRange | Should -Be 1
@@ -106,20 +106,20 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'Config_File.*=.*Config.*TeamViewerADC\.json'
         }
 
-        It 'Should have Log_Directory default pointing to Logs directory' {
+        It 'Should have Directory default pointing to Logs directory' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Log_Directory.*=.*Logs'
+            $scriptContent | Should -Match 'Directory.*=.*Logs'
         }
 
-        It 'Should have Log_Retention default of 16' {
+        It 'Should have Retention default of 16' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Log_Retention.*=.*16'
+            $scriptContent | Should -Match 'Retention.*=.*16'
         }
 
         It 'Should have Progress_Handler default as empty ScriptBlock' {
@@ -144,61 +144,28 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
     }
 
     Context 'Script block validation' {
-        It 'Should source required configuration helpers' {
+        It 'Should call Import-TVADCConfiguration' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Import-TeamViewerADCConfiguration\.ps1'
-            $scriptContent | Should -Match 'Test-TeamViewerADCConfiguration\.ps1'
+            $scriptContent | Should -Match 'Import-TVADCConfiguration'
         }
 
-        It 'Should source ActiveDirectory.ps1' {
+        It 'Should call Test-TVADCConfiguration' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'ActiveDirectory\.ps1'
+            $scriptContent | Should -Match 'Test-TVADCConfiguration'
         }
 
-        It 'Should source Sync.ps1' {
+        It 'Should call Invoke-TVADCSync' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Sync\.ps1'
-        }
-
-        It 'Should source Logfile.ps1' {
-            $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
-
-            $scriptContent = $commandInfo.ScriptBlock.ToString()
-
-            $scriptContent | Should -Match 'Logfile\.ps1'
-        }
-
-        It 'Should call Import-TeamViewerADCConfiguration' {
-            $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
-
-            $scriptContent = $commandInfo.ScriptBlock.ToString()
-
-            $scriptContent | Should -Match 'Import-TeamViewerADCConfiguration'
-        }
-
-        It 'Should call Test-TeamViewerADCConfiguration' {
-            $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
-
-            $scriptContent = $commandInfo.ScriptBlock.ToString()
-
-            $scriptContent | Should -Match 'Test-TeamViewerADCConfiguration'
-        }
-
-        It 'Should call Invoke-TeamViewerADCSync' {
-            $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
-
-            $scriptContent = $commandInfo.ScriptBlock.ToString()
-
-            $scriptContent | Should -Match 'Invoke-TeamViewerADCSync'
+            $scriptContent | Should -Match 'Invoke-TVADCSync'
         }
 
         It 'Should handle PassThru switch logic' {
@@ -217,31 +184,31 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Match 'ShouldProcess'
         }
 
-        It 'Should call Format-TeamViewerADCSyncLog when not PassThru' {
+        It 'Should call Format-TVADCSyncLog when not PassThru' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Format-TeamViewerADCSyncLog'
+            $scriptContent | Should -Match 'Format-TVADCSyncLog'
         }
 
-        It 'Should call Out-TeamViewerADCLogLine for logging' {
+        It 'Should call Out-TVADCLogLine for logging' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Out-TeamViewerADCLogLine'
+            $scriptContent | Should -Match 'Out-TVADCLogLine'
         }
 
-        It 'Should call Invoke-LogfileRotation for log rotation' {
+        It 'Should call Invoke-TeamViewerADCLogRotation for log rotation' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Invoke-LogfileRotation'
+            $scriptContent | Should -Match 'Invoke-TeamViewerADCLogRotation'
         }
 
-        It 'Should use Progress_Handler parameter in Invoke-TeamViewerADCSync calls' {
+        It 'Should use Progress_Handler parameter in Invoke-TVADCSync calls' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
@@ -257,9 +224,9 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             # Verify that we can construct a call with all parameters
             $params = @{
                 Config_File      = 'C:\test.json'
-                Log_Directory    = 'C:\logs'
-                Log_Basename     = 'TestLog_'
-                Log_Retention    = 10
+                Directory    = 'C:\logs'
+                Basename     = 'TestLog_'
+                Retention    = 10
                 Progress_Handler = {}
                 PassThru         = $true
                 Confirm          = $false
@@ -270,18 +237,18 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $missingParams | Should -BeNullOrEmpty
         }
 
-        It 'Should not require Log_Basename parameter when default is defined' {
+        It 'Should not require Basename parameter when default is defined' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
-            $param = $commandInfo.Parameters['Log_Basename']
+            $param = $commandInfo.Parameters['Basename']
             $isMandatory = $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] -and $_.Mandatory }
             $isMandatory | Should -BeNullOrEmpty
         }
 
-        It 'Should validate Log_Basename is not null or empty' {
+        It 'Should validate Basename is not null or empty' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
-            $param = $commandInfo.Parameters['Log_Basename']
+            $param = $commandInfo.Parameters['Basename']
             $validateNotNull = $param.Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateNotNullOrEmptyAttribute] }
             $validateNotNull | Should -Not -BeNullOrEmpty
         }
@@ -297,28 +264,28 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent | Should -Not -Match 'begin\s*\{'
         }
 
-        It 'Should use Log_Basename parameter in logging operations' {
+        It 'Should use Basename parameter in logging operations' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'Log_Basename'
+            $scriptContent | Should -Match 'Basename'
         }
 
-        It 'Should pass Log_Basename to Out-TeamViewerADCLogLine' {
+        It 'Should pass Basename to Out-TVADCLogLine' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'LogBasename.*\$Log_Basename'
+            $scriptContent | Should -Match 'Basename.*\$Basename'
         }
 
-        It 'Should pass Log_Basename to Invoke-LogfileRotation' {
+        It 'Should pass Basename to Invoke-TeamViewerADCLogRotation' {
             $commandInfo = Get-Command -Name Invoke-TeamViewerADCSynchronization
 
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
-            $scriptContent | Should -Match 'LogBasename.*\$Log_Basename'
+            $scriptContent | Should -Match 'Invoke-TeamViewerADCLogRotation.*Basename'
         }
 
         It 'Should have proper error handling with try-catch pattern in sourced files' {
@@ -328,7 +295,7 @@ Describe 'Invoke-TeamViewerADCSynchronization' {
             $scriptContent = $commandInfo.ScriptBlock.ToString()
 
             # Should invoke sync and handle the results
-            $scriptContent | Should -Match 'Invoke-TeamViewerADCSync'
+            $scriptContent | Should -Match 'Invoke-TVADCSync'
         }
     }
 }

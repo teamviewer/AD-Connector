@@ -5,7 +5,7 @@
 
     param()
 
-    $ScheduledTask = Get-TeamViewerADCScheduledTask
+    $ScheduledTask = Get-TVADCScheduledTask
 
     if ($ScheduledTask -and $PSCmdlet.ShouldProcess($ScheduledTask.TaskName, 'Unregister scheduled task.')) {
         Unregister-ScheduledTask -TaskPath $ScheduledTask.TaskPath -TaskName $ScheduledTask.TaskName -Confirm:$false

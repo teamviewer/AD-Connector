@@ -1,6 +1,4 @@
-﻿#Requires -RunAsAdministrator
-
-function Invoke-TeamViewerADCConfiguration {
+﻿function Invoke-TeamViewerADCConfiguration {
    [CmdletBinding()]
 
    param(
@@ -15,17 +13,17 @@ function Invoke-TeamViewerADCConfiguration {
    )
 
    process {
-      (. "$PSScriptRoot\..\Private\Import-TeamViewerADCConfiguration.ps1")
-      (. "$PSScriptRoot\..\Private\Save-TeamViewerADCConfiguration.ps1")
-      (. "$PSScriptRoot\..\Private\Test-TeamViewerADCConfiguration.ps1")
-      (. "$PSScriptRoot\..\Private\ActiveDirectory.ps1")
-      (. "$PSScriptRoot\..\Private\ScheduledSync.ps1")
-      (. "$PSScriptRoot\..\Private\GraphicalUserInterface.ps1")
+      # Requires elevation to manage the scheduled synchronization task.
+      if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+         throw 'Invoke-TeamViewerADCConfiguration requires administrator privileges.'
+      }
 
-      $Configuration = Import-TeamViewerADCConfiguration -ConfigFile $Config_File
-      # ToDo: Check if needed and what happens
-      Test-TeamViewerADCConfiguration -Config_Content $Configuration
+      $Configuration = Import-TVADCConfiguration -Config_File $Config_File
 
-      Invoke-GraphicalUserInterfaceConfiguration $Configuration $Culture
+      # ToDo: Review if Test-TVADCConfiguration is strictly necessary before invoking the GUI.
+      # This call validates the configuration but may have side effects or overhead.
+      Test-TVADCConfiguration -Configuration $Configuration
+
+      Invoke-TVADCGuiConfiguration $Configuration -Culture $Culture
    }
 }
