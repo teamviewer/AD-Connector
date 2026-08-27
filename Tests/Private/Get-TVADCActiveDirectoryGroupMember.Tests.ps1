@@ -99,10 +99,11 @@ Describe 'Get-TVADCActiveDirectoryGroupMember' {
             return @(
                 [pscustomobject]@{
                     Properties = [pscustomobject]@{
+                        userPrincipalName  = @('alice@contoso.com')
                         name               = @('Alice Example')
                         mail               = @('alice@example.com')
                         userAccountControl = @(0)
-                        proxyAddresses     = @('SMTP:alice@example.com', 'smtp:alice.alias@example.com', 'x500:legacy')
+                        proxyAddresses     = @('SMTP:alice@example.com', 'smtp:alice.alias@example.com', 'smtp:alice.alias@example.com', 'x500:legacy')
                     }
                 }
             )
@@ -115,6 +116,7 @@ Describe 'Get-TVADCActiveDirectoryGroupMember' {
 
         $MockDirectorySearcher.SearchRoot | Should -Be $MockDirectoryEntry
         $MockDirectorySearcher.Filter | Should -Be '(&(objectClass=user)(memberOf=CN=Group,DC=example,DC=com))'
+        $MockDirectorySearcher.PropertiesToLoad | Should -Contain 'userPrincipalName'
         $MockDirectorySearcher.PropertiesToLoad | Should -Contain 'name'
         $MockDirectorySearcher.PropertiesToLoad | Should -Contain 'mail'
         $MockDirectorySearcher.PropertiesToLoad | Should -Contain 'userAccountControl'
@@ -123,10 +125,10 @@ Describe 'Get-TVADCActiveDirectoryGroupMember' {
         $MockDirectorySearcher.SizeLimit | Should -Be 50
 
         $Result | Should -HaveCount 1
-        $Result[0].Email | Should -Be 'alice@example.com'
+        $Result[0].Email | Should -Be 'alice@contoso.com'
         $Result[0].Name | Should -Be 'Alice Example'
         $Result[0].IsEnabled | Should -BeTrue
-        $Result[0].SecondaryEmails | Should -Be 'alice.alias@example.com'
+        $Result[0].SecondaryEmails | Should -Be @('alice@example.com', 'alice.alias@example.com')
     }
 
     It 'uses the recursive membership filter when requested' {
@@ -148,7 +150,7 @@ Describe 'Get-TVADCActiveDirectoryGroupMember' {
         $MockDirectorySearcher.Filter | Should -Be '(&(objectClass=user)(memberOf:1.2.840.113556.1.4.1941:=CN=Group,DC=example,DC=com))'
     }
 
-    It 'excludes disabled and incomplete users' {
+    It 'excludes disabled and users without a valid external email address' {
         $MockDirectoryEntry = [pscustomobject]@{ DistinguishedName = 'LDAP://DC=example,DC=com' }
         $MockDirectorySearcher = [pscustomobject]@{
             SearchRoot       = $null
@@ -160,9 +162,11 @@ Describe 'Get-TVADCActiveDirectoryGroupMember' {
 
         $MockDirectorySearcher | Add-Member -MemberType ScriptMethod -Name FindAll -Value {
             return @(
-                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('Disabled'); mail = @('disabled@example.com'); userAccountControl = @(2); proxyAddresses = @() } }
-                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('No Email'); mail = @(''); userAccountControl = @(0); proxyAddresses = @() } }
-                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('Valid'); mail = @('valid@example.com'); userAccountControl = @(0); proxyAddresses = @() } }
+                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('Disabled'); mail = @('disabled@example.com'); userPrincipalName = @('disabled@contoso.com'); userAccountControl = @(2); proxyAddresses = @() } }
+                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('No Email'); mail = @(''); userPrincipalName = @(''); userAccountControl = @(0); proxyAddresses = @() } }
+                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('Local Domain'); mail = @('local@contoso.local'); userPrincipalName = @('local@contoso.local'); userAccountControl = @(0); proxyAddresses = @('SMTP:local.alias@contoso.local') } }
+                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('Invalid Email'); mail = @('not-an-email'); userPrincipalName = @('invalid@contoso'); userAccountControl = @(0); proxyAddresses = @() } }
+                [pscustomobject]@{ Properties = [pscustomobject]@{ name = @('Valid'); mail = @('valid@example.com'); userPrincipalName = @(''); userAccountControl = @(0); proxyAddresses = @() } }
             )
         }
 

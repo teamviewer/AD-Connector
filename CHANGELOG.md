@@ -11,6 +11,7 @@
 
 ### Changed
 
+- Prevents synchronization of Active Directory users without a valid external email address, including `.local` domains.
 - Packages the TeamViewer Active Directory Connector as the `TeamViewerADC` PowerShell module.
 
 ## 1.5.0

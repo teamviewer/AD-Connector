@@ -22,6 +22,7 @@ Invoke-TeamViewerADCSynchronization [[-Config_File] <String>] [[-Directory] <Str
 Reads the configuration and synchronizes the configured Active Directory users (and, when enabled,
 user groups) to the TeamViewer company associated with the configured API token.
 Users present in Active Directory are created or updated in TeamViewer.
+Users without a valid external email address, including addresses in `.local` domains, are not synchronized.
 When enabled, TeamViewer users that are no longer part of the configured Active Directory groups are deactivated.
 
 Unless -PassThru is specified, the synchronization result is written to a dated log file in the log directory and old log files are rotated according to the retention setting.

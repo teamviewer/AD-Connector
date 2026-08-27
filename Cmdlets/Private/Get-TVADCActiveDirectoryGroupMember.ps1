@@ -37,22 +37,36 @@
         $ADS_Searcher.Filter = "(&(objectClass=user)(memberOf=$AD_Path))"
     }
 
-    $ADS_Searcher.PropertiesToLoad.AddRange(@('name', 'mail', 'userAccountControl', 'proxyAddresses'))
+    $ADS_Searcher.PropertiesToLoad.AddRange(@('userPrincipalName', 'name', 'mail', 'userAccountControl', 'proxyAddresses'))
     $ADS_Searcher.PageSize = 1000
     $ADS_Searcher.SizeLimit = $Limit
 
     $Result = $ADS_Searcher.FindAll()
 
     return $Result | ForEach-Object -Process {
-        $SecondaryEmails = $_.Properties.proxyaddresses | Select-String -Pattern '^smtp:(.*)$' -CaseSensitive -AllMatches |
-        Select-Object -ExpandProperty Matches | Where-Object -FilterScript { $_.Groups.Count -gt 0 } |
-        ForEach-Object -Process { [string]($_.Groups[1].Value).Trim() }
+        $UserPrincipalName = [string]$_.Properties.userprincipalname
+        $ExternalEmailCandidates = @(
+            $UserPrincipalName
+            [string]$_.Properties.mail
+            $_.Properties.proxyaddresses | Where-Object -FilterScript { $_ -match '^(SMTP|smtp):' } |
+            ForEach-Object -Process { $_ -replace '^(SMTP|smtp):', '' }
+        ) | ForEach-Object -Process { $_.Trim() } |
+        Where-Object -FilterScript { $_ -match '^[^@\s]+@[^@\s]+\.[^@\s]+$' -and $_ -notmatch '@[^@]+\.local$' } |
+        Select-Object -Unique
+
+        $PrimaryEmail = $ExternalEmailCandidates | Select-Object -First 1
+        $IsEnabled = [bool](($_.Properties.useraccountcontrol.Item(0) -band 2) -eq 0)
+        $Name = [string]$_.Properties.name
+
+        if (-not $PrimaryEmail -or -not $Name -or -not $IsEnabled) {
+            return
+        }
 
         [pscustomobject]@{
-            Email           = [string]($_.Properties.mail)
-            Name            = [string]($_.Properties.name)
-            IsEnabled       = [bool](($_.Properties.useraccountcontrol.Item(0) -band 2) -eq 0)
-            SecondaryEmails = $SecondaryEmails
+            Email           = $PrimaryEmail
+            Name            = $Name
+            IsEnabled       = $true
+            SecondaryEmails = @($ExternalEmailCandidates | Where-Object -FilterScript { $_ -ne $PrimaryEmail })
         }
-    } | Where-Object -FilterScript { $_.Email -and $_.Name -and $_.IsEnabled }
+    }
 }
