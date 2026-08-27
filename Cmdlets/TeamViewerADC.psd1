@@ -26,9 +26,6 @@
     # Minimum version of the PowerShell engine required by this module.
     PowerShellVersion    = '5.1'
 
-    # Formatting files (.ps1xml) to be loaded when importing this module.
-    FormatsToProcess     = @('TeamViewerADC.format.ps1xml')
-
     # Functions to export from this module. Keep alphabetized.
     FunctionsToExport    = '*'
 

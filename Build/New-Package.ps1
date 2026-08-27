@@ -40,7 +40,6 @@ New-ExternalHelp -Path (Join-Path -Path $Repo_RootPath -ChildPath 'Docs\Help') -
 # Create module manifest
 Write-Verbose 'Creating module manifest...'
 Copy-Item -Path (Join-Path -Path $Repo_CmdletPath -ChildPath 'TeamViewerADC.psd1') -Destination $Build_OutputPath
-Copy-Item -Path (Join-Path -Path $Repo_CmdletPath -ChildPath '*.format.ps1xml') -Destination $Build_OutputPath
 
 Update-Metadata -Path (Join-Path -Path $Build_OutputPath -ChildPath 'TeamViewerADC.psd1') -PropertyName 'FunctionsToExport' -Value $PublicFunctions.BaseName
 
