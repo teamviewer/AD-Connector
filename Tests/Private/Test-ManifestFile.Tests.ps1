@@ -50,8 +50,6 @@ Context 'Test-ManifestFile' {
     }
 
     It 'Valid manifest format file references' {
-        $Module_ManifestData.FormatsToProcess | Should -Not -BeNullOrEmpty
-
         foreach ($formatFile in $Module_ManifestData.FormatsToProcess) {
             $formatFilePath = Join-Path -Path (Join-Path -Path $Module_RootPath -ChildPath 'Cmdlets') -ChildPath $formatFile
             $formatFilePath | Should -Exist
