@@ -1,4 +1,5 @@
 ﻿BeforeAll {
+    . "$PSScriptRoot\..\..\Cmdlets\Private\Get-TVADCConfigurationDefault.ps1"
     . "$PSScriptRoot\..\..\Cmdlets\Private\Import-TVADCConfiguration.ps1"
 }
 
@@ -28,9 +29,9 @@ Describe 'Import-TVADCConfiguration' {
 
         $ConfigContent.Api_Token | Should -Be 'test-token'
         $ConfigContent.ActiveDirectory_Groups | Should -BeNullOrEmpty
-        $ConfigContent.Use_DefaultPassword | Should -BeTrue
-        $ConfigContent.Use_GeneratedPassword | Should -BeFalse
-        $ConfigContent.Environment | Should -Be 'global'
+        $ConfigContent.Use_DefaultPassword | Should -BeFalse
+        $ConfigContent.Use_GeneratedPassword | Should -BeTrue
+        $ConfigContent.Api_Uri | Should -Be 'https://webapi.teamviewer.com/api/v1'
         $ConfigContent.PSObject.Properties.Name | Should -Not -Contain 'ApiToken'
     }
 
@@ -40,7 +41,7 @@ Describe 'Import-TVADCConfiguration' {
 
         $ConfigContent = Import-TVADCConfiguration -Config_File $SourceConfigFile
 
-        $ConfigContent.Environment | Should -Be 'global'
+        $ConfigContent.Api_Uri | Should -Be 'https://webapi.teamviewer.com/api/v1'
         $ConfigContent.Api_Token | Should -Be ''
         $ConfigContent.TestRun | Should -BeTrue
         $ConfigContent.ActiveDirectory_Root | Should -Be ''
@@ -49,8 +50,8 @@ Describe 'Import-TVADCConfiguration' {
         $ConfigContent.User_MeetingLicenseKey | Should -Be ''
         $ConfigContent.User_DefaultPassword | Should -Be ''
         $ConfigContent.Sso_CustomerId | Should -Be ''
-        $ConfigContent.Use_DefaultPassword | Should -BeTrue
-        $ConfigContent.Use_GeneratedPassword | Should -BeFalse
+        $ConfigContent.Use_DefaultPassword | Should -BeFalse
+        $ConfigContent.Use_GeneratedPassword | Should -BeTrue
         $ConfigContent.Use_SsoCustomerId | Should -BeFalse
         $ConfigContent.Sync_DeactivateUsers | Should -BeTrue
         $ConfigContent.Sync_UseSecondaryEmails | Should -BeTrue
@@ -61,7 +62,7 @@ Describe 'Import-TVADCConfiguration' {
     It 'preserves configured values without replacing them with defaults' {
         $SourceConfigFile = Join-Path -Path $TestDrive -ChildPath 'Configured.json'
         $ConfiguredValues = @{
-            Environment              = 'preview'
+            Api_Uri                  = 'https://webapi.teamviewer.com/api/v1'
             Api_Token                = 'configured-token'
             TestRun                  = $false
             ActiveDirectory_Root     = 'LDAP://DC=example,DC=com'
@@ -79,7 +80,7 @@ Describe 'Import-TVADCConfiguration' {
 
         $ConfigContent = Import-TVADCConfiguration -Config_File $SourceConfigFile
 
-        $ConfigContent.Environment | Should -Be 'preview'
+        $ConfigContent.Api_Uri | Should -Be 'https://webapi.teamviewer.com/api/v1'
         $ConfigContent.Api_Token | Should -Be 'configured-token'
         $ConfigContent.TestRun | Should -BeFalse
         $ConfigContent.ActiveDirectory_Groups | Should -Be @('GroupA', 'GroupB')

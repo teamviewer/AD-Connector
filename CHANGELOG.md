@@ -4,14 +4,20 @@
 
 ### Added
 
-- Adds translations for `es`, `fr`, and `it`.
+- Adds `Get-TeamViewerADCConfiguration` and `Set-TeamViewerADCConfiguration` to read and change configuration settings without a graphical interface.
+- Adds `Convert-TeamViewerADCConfiguration` to migrate a legacy `TeamViewerADConnector` configuration file to the current format.
 - Adds `AGENTS.md` file for AI coding agents.
 - Imports `TeamViewerPS` PowerShell module for API calls.
-- Adds a setting for the TeamViewer API environment to the configuration.
+- Adds an `Api_Uri` setting to configure the TeamViewer web API base URI.
 
 ### Changed
 
 - Packages the TeamViewer Active Directory Connector as the `TeamViewerADC` PowerShell module.
+- Applies the configured `Api_Uri` during synchronization.
+
+### Removed
+
+- Removes the graphical configuration interface and the `Invoke-TeamViewerADCConfiguration` command in favor of the configuration cmdlets.
 
 ## 1.5.0
 

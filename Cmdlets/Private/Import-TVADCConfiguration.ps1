@@ -10,24 +10,7 @@
         $Config_File = (Join-Path -Path $PSScriptRoot -ChildPath 'Config\TeamViewerADC.json')
     )
 
-    $Configuration_Default = @{
-        Environment              = 'global'
-        Api_Token                = ''
-        TestRun                  = $true
-        ActiveDirectory_Root     = ''
-        ActiveDirectory_Groups   = @()
-        User_Language            = 'en'
-        User_MeetingLicenseKey   = ''
-        User_DefaultPassword     = ''
-        Sso_CustomerId           = ''
-        Use_DefaultPassword      = $true
-        Use_GeneratedPassword    = $false
-        Use_SsoCustomerId        = $false
-        Sync_DeactivateUsers     = $true
-        Sync_UseSecondaryEmails  = $true
-        Sync_SyncUserGroups      = $false
-        Sync_RecursiveUserGroups = $true
-    }
+    $Configuration_Default = Get-TVADCConfigurationDefault
 
     if (Test-Path -Path $Config_File -PathType Leaf) {
         $Configuration = Get-Content -Path $Config_File | Out-String | ConvertFrom-Json

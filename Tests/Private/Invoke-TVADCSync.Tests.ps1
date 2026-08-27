@@ -19,6 +19,11 @@
         param($Handler, $Percent, $Operation)
         $null = $Handler, $Percent, $Operation
     }
+    function Set-TeamViewerAPIUri {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test double does not change state.')]
+        param($NewUri, $Default)
+        $null = $NewUri, $Default
+    }
 
     . "$PSScriptRoot\..\..\Cmdlets\Private\Invoke-TVADCSync.ps1"
 }
@@ -30,6 +35,7 @@ Describe 'Invoke-TVADCSync' {
         Mock Invoke-TVADCSyncUser { @{ Activity = 'SyncUser'; Statistics = @{}; Duration = [timespan]::Zero } }
         Mock Invoke-TVADCSyncUserGroup { @{ Activity = 'SyncUserGroups'; Statistics = @{}; Duration = [timespan]::Zero } }
         Mock Out-TVADCSyncProgress
+        Mock Set-TeamViewerAPIUri
     }
 
     It 'declares the expected advanced function contract' {
@@ -62,5 +68,21 @@ Describe 'Invoke-TVADCSync' {
         Should -Invoke Out-TVADCSyncProgress -Times 1 -Exactly -ParameterFilter {
             $Handler -eq $Progress -and $Percent -eq 100 -and $Operation -eq 'Completed synchronization.'
         }
+    }
+
+    It 'uses the default API URI when Api_Uri is not configured' {
+        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_SyncUserGroups = $false; Api_Uri = '' }
+
+        Invoke-TVADCSync -Configuration $Configuration -Progress { } | Out-Null
+
+        Should -Invoke Set-TeamViewerAPIUri -Times 1 -Exactly -ParameterFilter { $Default -eq $true }
+    }
+
+    It 'applies the configured Api_Uri' {
+        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_SyncUserGroups = $false; Api_Uri = 'https://webapi.teamviewer.com/api/v1' }
+
+        Invoke-TVADCSync -Configuration $Configuration -Progress { } | Out-Null
+
+        Should -Invoke Set-TeamViewerAPIUri -Times 1 -Exactly -ParameterFilter { $NewUri -eq 'https://webapi.teamviewer.com/api/v1' }
     }
 }
