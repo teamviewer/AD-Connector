@@ -54,10 +54,19 @@ Describe 'Set-TeamViewerADCConfiguration' {
         $SavedConfig.Use_GeneratedPassword | Should -BeTrue
     }
 
-    It 'throws when no setting is provided' {
-        $ConfigFile = Join-Path -Path $TestDrive -ChildPath 'None.json'
+    It 'uses default configurations when called without parameters' {
+        Mock Save-TVADCConfiguration {
+            param($Configuration)
 
-        { Set-TeamViewerADCConfiguration -Config_File $ConfigFile } | Should -Throw
+            $script:SavedConfiguration = $Configuration
+        }
+
+        Set-TeamViewerADCConfiguration
+
+        $script:SavedConfiguration.Api_Uri | Should -Be 'https://webapi.teamviewer.com/api/v1'
+        $script:SavedConfiguration.TestRun | Should -BeTrue
+        $script:SavedConfiguration.Use_GeneratedPassword | Should -BeTrue
+        $script:SavedConfiguration.User_DefaultPassword | Should -Be ''
     }
 
     It 'rejects an invalid meeting license key' {

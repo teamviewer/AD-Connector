@@ -69,7 +69,7 @@
 
         [Parameter(Mandatory = $false)]
         [bool]
-        $Sync_SyncUserGroups,
+        $Sync_IncludeUserGroups,
 
         [Parameter(Mandatory = $false)]
         [bool]
@@ -80,11 +80,12 @@
         $PassThru
     )
 
-    $Config_DefaultItems = (Get-TVADCConfigurationDefault).Keys
+    $Config_Default = Get-TVADCConfigurationDefault
+    $Config_DefaultItems = $Config_Default.Keys
     $Config_ProvidedItems = @($Config_DefaultItems | Where-Object { $PSBoundParameters.ContainsKey($_) })
 
     if ($Config_ProvidedItems.Count -eq 0) {
-        throw 'Specify at least one configuration item to change.'
+        $Config_ProvidedItems = $Config_DefaultItems
     }
 
     if (Test-Path -Path $Config_File -PathType Leaf) {
@@ -96,7 +97,10 @@
     }
 
     foreach ($Config_ProvidedItem in $Config_ProvidedItems) {
-        if ($Config_ProvidedItem -eq 'User_DefaultPassword') {
+        if (!$PSBoundParameters.ContainsKey($Config_ProvidedItem)) {
+            $Configuration.$Config_ProvidedItem = $Config_Default[$Config_ProvidedItem]
+        }
+        elseif ($Config_ProvidedItem -eq 'User_DefaultPassword') {
             $Password_Pointer = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($PSBoundParameters[$Config_ProvidedItem])
 
             try {

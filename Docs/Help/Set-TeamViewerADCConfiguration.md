@@ -19,7 +19,7 @@ Set-TeamViewerADCConfiguration [[-Config_File] <String>] [-Api_Uri <String>] [-A
  [-User_Language <String>] [-User_MeetingLicenseKey <String>] [-User_DefaultPassword <SecureString>]
  [-Sso_CustomerId <String>] [-Use_DefaultPassword <Boolean>] [-Use_GeneratedPassword <Boolean>]
  [-Use_SsoCustomerId <Boolean>] [-Sync_DeactivateUsers <Boolean>] [-Sync_UseSecondaryEmails <Boolean>]
- [-Sync_SyncUserGroups <Boolean>] [-Sync_RecursiveUserGroups <Boolean>] [-PassThru]
+ [-Sync_IncludeUserGroups <Boolean>] [-Sync_RecursiveUserGroups <Boolean>] [-PassThru]
  [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
@@ -290,7 +290,7 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Sync_SyncUserGroups
+### -Sync_IncludeUserGroups
 
 If set to `$true` the configured Active Directory groups and their members are synchronized with TeamViewer user groups.
 

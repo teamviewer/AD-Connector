@@ -77,7 +77,7 @@
     Add-TVADCSyncLogLine "Created table with $($TV_UsersByEmail.Count) TV users indexed by email."
 
     # When enabled, preload TV user groups and their memberships for user group synchronization.
-    if ($Configuration.Sync_SyncUserGroups) {
+    if ($Configuration.Sync_IncludeUserGroups) {
         Out-TVADCSyncProgress -Handler $Progress -Percent 20 -Operation 'GetTeamViewerUserGroups'
         Add-TVADCSyncLogLine 'Fetching list of TV user groups...'
 

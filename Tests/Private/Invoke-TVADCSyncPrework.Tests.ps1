@@ -85,7 +85,7 @@ Describe 'Invoke-TVADCSyncPrework' {
             Api_Token                = 'test-token'
             Sync_RecursiveUserGroups = $false
             Sync_UseSecondaryEmails  = $false
-            Sync_SyncUserGroups      = $false
+            Sync_IncludeUserGroups   = $false
         }
         $progress = @{ Initialized = $true }
 
@@ -104,7 +104,7 @@ Describe 'Invoke-TVADCSyncPrework' {
             Api_Token                = 'test-token'
             Sync_RecursiveUserGroups = $false
             Sync_UseSecondaryEmails  = $false
-            Sync_SyncUserGroups      = $false
+            Sync_IncludeUserGroups   = $false
         }
         $progress = @{ Initialized = $true }
 
@@ -123,7 +123,7 @@ Describe 'Invoke-TVADCSyncPrework' {
             Api_Token                = 'test-token'
             Sync_RecursiveUserGroups = $false
             Sync_UseSecondaryEmails  = $false
-            Sync_SyncUserGroups      = $false
+            Sync_IncludeUserGroups   = $false
         }
         $progress = @{ Initialized = $true }
 

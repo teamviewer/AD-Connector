@@ -118,7 +118,7 @@ Start PowerShell as administrator before running those commands.
 
   If set to `true` the secondary email addresses configured for an Active Directory user will also be taken into account when trying to map to a TeamViewer user.
 
-- Parameter `Sync_SyncUserGroups`:
+- Parameter `Sync_IncludeUserGroups`:
 
   If set to `true` the script attempts to synchronize the given Active Directory user groups and their respective users with the TeamViewer user groups.
   Those user groups can then be used to configure TeamViewer functionality, for example: Single Sign-On ownership or exclusions.

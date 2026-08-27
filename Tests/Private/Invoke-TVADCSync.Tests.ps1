@@ -54,7 +54,7 @@ Describe 'Invoke-TVADCSync' {
     }
 
     It 'runs the sync steps and reports completion progress' {
-        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_SyncUserGroups = $false }
+        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_IncludeUserGroups = $false }
         $Progress = { }
 
         $Result = Invoke-TVADCSync -Configuration $Configuration -Progress $Progress
@@ -71,7 +71,7 @@ Describe 'Invoke-TVADCSync' {
     }
 
     It 'uses the default API URI when Api_Uri is not configured' {
-        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_SyncUserGroups = $false; Api_Uri = '' }
+        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_IncludeUserGroups = $false; Api_Uri = '' }
 
         Invoke-TVADCSync -Configuration $Configuration -Progress { } | Out-Null
 
@@ -79,7 +79,7 @@ Describe 'Invoke-TVADCSync' {
     }
 
     It 'applies the configured Api_Uri' {
-        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_SyncUserGroups = $false; Api_Uri = 'https://webapi.teamviewer.com/api/v1' }
+        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_IncludeUserGroups = $false; Api_Uri = 'https://webapi.teamviewer.com/api/v1' }
 
         Invoke-TVADCSync -Configuration $Configuration -Progress { } | Out-Null
 

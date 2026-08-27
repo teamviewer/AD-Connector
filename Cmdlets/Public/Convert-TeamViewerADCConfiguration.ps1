@@ -34,7 +34,7 @@
         DeactivateUsers       = 'Sync_DeactivateUsers'
         RecursiveGroups       = 'Sync_RecursiveUserGroups'
         UseSecondaryEmails    = 'Sync_UseSecondaryEmails'
-        EnableUserGroupsSync  = 'Sync_SyncUserGroups'
+        EnableUserGroupsSync  = 'Sync_IncludeUserGroups'
         MeetingLicenseKey     = 'User_MeetingLicenseKey'
     }
 

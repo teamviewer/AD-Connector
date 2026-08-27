@@ -28,7 +28,7 @@ Describe 'Get-TVADCConfigurationDefault' {
         $Defaults.Use_SsoCustomerId | Should -BeFalse
         $Defaults.Sync_DeactivateUsers | Should -BeTrue
         $Defaults.Sync_UseSecondaryEmails | Should -BeTrue
-        $Defaults.Sync_SyncUserGroups | Should -BeFalse
+        $Defaults.Sync_IncludeUserGroups | Should -BeFalse
         $Defaults.Sync_RecursiveUserGroups | Should -BeTrue
     }
 

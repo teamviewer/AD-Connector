@@ -53,7 +53,7 @@ Describe 'Convert-TeamViewerADCConfiguration' {
         $Converted.Sync_DeactivateUsers | Should -BeFalse
         $Converted.Sync_RecursiveUserGroups | Should -BeFalse
         $Converted.Sync_UseSecondaryEmails | Should -BeFalse
-        $Converted.Sync_SyncUserGroups | Should -BeTrue
+        $Converted.Sync_IncludeUserGroups | Should -BeTrue
         $Converted.User_MeetingLicenseKey | Should -Be '4d00238a-9391-44cd-88ab-631194a97de5'
         $Converted.Api_Uri | Should -Be 'https://webapi.teamviewer.com/api/v1'
         $Converted.PSObject.Properties.Name | Should -Not -Contain 'Filename'

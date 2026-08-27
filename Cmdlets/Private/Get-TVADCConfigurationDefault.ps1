@@ -20,7 +20,7 @@
         Use_SsoCustomerId        = $false
         Sync_DeactivateUsers     = $true
         Sync_UseSecondaryEmails  = $true
-        Sync_SyncUserGroups      = $false
+        Sync_IncludeUserGroups   = $false
         Sync_RecursiveUserGroups = $true
     }
 }
