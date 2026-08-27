@@ -48,7 +48,7 @@ Describe 'Invoke-TVADCSync' {
     }
 
     It 'runs the sync steps and reports completion progress' {
-        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_SyncUserGroups = $false }
+        $Configuration = [pscustomobject]@{ TestRun = $false; Sync_IncludeUserGroups = $false }
         $Progress = { }
 
         $Result = Invoke-TVADCSync -Configuration $Configuration -Progress $Progress

@@ -27,7 +27,7 @@
     Invoke-TVADCSyncPrework -Sync_Context $Sync_Context -Configuration $Configuration -Progress $Progress
     Invoke-TVADCSyncUser -Sync_Context $Sync_Context -Configuration $Configuration -Progress $Progress
 
-    if ($Configuration.Sync_SyncUserGroups) {
+    if ($Configuration.Sync_IncludeUserGroups) {
         Invoke-TVADCSyncUserGroup -Sync_Context $Sync_Context -Configuration $Configuration -Progress $Progress
     }
 

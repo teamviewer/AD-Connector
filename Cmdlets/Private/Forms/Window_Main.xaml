@@ -89,7 +89,7 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="1" Margin="5">
                                         <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.RecursiveGroups}" IsChecked="{Binding ConfigurationData.Sync_RecursiveUserGroups}"/>
-                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.EnableUserGroupsSync}" IsChecked="{Binding ConfigurationData.Sync_SyncUserGroups}"/>
+                                        <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.EnableUserGroupsSync}" IsChecked="{Binding ConfigurationData.Sync_IncludeUserGroups}"/>
                                         <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.UseSecondaryEmails}" IsChecked="{Binding ConfigurationData.Sync_UseSecondaryEmails}"/>
                                         <CheckBox VerticalAlignment="Top" Margin="0,5,5,5" Content="{Binding L.DeactivateUsers}" IsChecked="{Binding ConfigurationData.Sync_DeactivateUsers}"/>
                                     </StackPanel>

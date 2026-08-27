@@ -54,7 +54,7 @@ Describe 'Import-TVADCConfiguration' {
         $ConfigContent.Use_SsoCustomerId | Should -BeFalse
         $ConfigContent.Sync_DeactivateUsers | Should -BeTrue
         $ConfigContent.Sync_UseSecondaryEmails | Should -BeTrue
-        $ConfigContent.Sync_SyncUserGroups | Should -BeFalse
+        $ConfigContent.Sync_IncludeUserGroups | Should -BeFalse
         $ConfigContent.Sync_RecursiveUserGroups | Should -BeTrue
     }
 
@@ -72,7 +72,7 @@ Describe 'Import-TVADCConfiguration' {
             Use_SsoCustomerId        = $true
             Sync_DeactivateUsers     = $false
             Sync_UseSecondaryEmails  = $false
-            Sync_SyncUserGroups      = $true
+            Sync_IncludeUserGroups   = $true
             Sync_RecursiveUserGroups = $false
         }
         $ConfiguredValues | ConvertTo-Json | Set-Content -Path $SourceConfigFile -Encoding UTF8
@@ -89,7 +89,7 @@ Describe 'Import-TVADCConfiguration' {
         $ConfigContent.Use_SsoCustomerId | Should -BeTrue
         $ConfigContent.Sync_DeactivateUsers | Should -BeFalse
         $ConfigContent.Sync_UseSecondaryEmails | Should -BeFalse
-        $ConfigContent.Sync_SyncUserGroups | Should -BeTrue
+        $ConfigContent.Sync_IncludeUserGroups | Should -BeTrue
         $ConfigContent.Sync_RecursiveUserGroups | Should -BeFalse
     }
 
