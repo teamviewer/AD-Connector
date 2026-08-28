@@ -42,6 +42,6 @@
 
         $SchedTask_Principal = New-ScheduledTaskPrincipal -UserId 'NETWORKSERVICE' -LogonType ServiceAccount
 
-        return Register-ScheduledTask -TaskPath $SchedTask_Path -TaskName $SchedTask_Name -Action $SchedTask_Action -Trigger $SchedTask_Trigger -Principal $SchedTask_Principal
+        return Register-TVADCScheduledTask -TaskPath $SchedTask_Path -TaskName $SchedTask_Name -Action $SchedTask_Action -Trigger $SchedTask_Trigger -Principal $SchedTask_Principal
     }
 }

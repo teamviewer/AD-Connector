@@ -1,4 +1,4 @@
-﻿#requires -Modules BuildHelpers, platyPS
+﻿#requires -Modules BuildHelpers, Microsoft.PowerShell.PlatyPS
 
 param(
     [Parameter()]
@@ -34,8 +34,15 @@ Write-Verbose "Found $($PublicFunctions.Count) public function files."
 
 # Create help from markdown
 Write-Verbose 'Building help from Markdown...'
-New-ExternalHelp -Path (Join-Path -Path $Repo_RootPath -ChildPath 'Docs') -OutputPath (Join-Path -Path $Build_OutputPath -ChildPath 'en-US') | Out-Null
-New-ExternalHelp -Path (Join-Path -Path $Repo_RootPath -ChildPath 'Docs\Help') -OutputPath (Join-Path -Path $Build_OutputPath -ChildPath 'en-US') | Out-Null
+$Help_Command = @(Measure-PlatyPSMarkdown -Path (Join-Path -Path $Repo_RootPath -ChildPath 'Docs\Help\*.md') |
+    Where-Object -Property Filetype -Match 'CommandHelp' | ForEach-Object { Import-MarkdownCommandHelp -Path $_.FilePath })
+
+$Help_OutputPath = Join-Path -Path $Build_OutputPath -ChildPath 'en-US'
+$Help_ModulePath = Join-Path -Path $Help_OutputPath -ChildPath 'TeamViewerADC'
+$Help_Command | Export-MamlCommandHelp -OutputFolder $Help_OutputPath | Out-Null
+
+Move-Item -LiteralPath (Join-Path -Path $Help_ModulePath -ChildPath 'TeamViewerADC-help.xml') -Destination $Help_OutputPath
+Remove-Item -Path $Help_ModulePath -Recurse
 
 # Create module manifest
 Write-Verbose 'Creating module manifest...'
