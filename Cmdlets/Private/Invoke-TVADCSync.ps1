@@ -21,6 +21,13 @@
         Add-TVADCSyncLogLine "Mode 'Test Run' is active. No modifications will be made."
     }
 
+    if ([string]::IsNullOrWhiteSpace($Configuration.Api_Uri)) {
+        Set-TeamViewerAPIUri -Default $true
+    }
+    else {
+        Set-TeamViewerAPIUri -NewUri $Configuration.Api_Uri
+    }
+
     $Sync_Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     $Sync_Context = @{ }
 

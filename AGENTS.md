@@ -20,8 +20,8 @@ Targets Windows PowerShell 5.1 and PowerShell 6+ on Windows.
 Run commands from the repository root:
 
 ```powershell
-Invoke-ScriptAnalyzer -Path . -Recurse -Settings .\Linters\PSScriptAnalyzer.psd1
-Invoke-Pester -Path .
+Invoke-ScriptAnalyzer -Path ${workspaceFolder} -Recurse -Settings ${workspaceFolder}\Linters\PSScriptAnalyzer.psd1
+Invoke-Pester -Path ${workspaceFolder}
 ```
 
 - Do not hardcode tokens, credentials, or machine-specific values.

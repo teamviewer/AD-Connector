@@ -1,5 +1,6 @@
 ﻿BeforeAll {
     . "$PSScriptRoot\..\..\Cmdlets\Private\Get-TVADCScheduledTask.ps1"
+    . "$PSScriptRoot\..\..\Cmdlets\Private\Register-TVADCScheduledTask.ps1"
     . "$PSScriptRoot\..\..\Cmdlets\Public\New-TeamViewerADCScheduledTask.ps1"
 }
 
@@ -9,7 +10,7 @@ Describe 'New-TeamViewerADCScheduledTask' {
         Mock New-ScheduledTaskAction { return 'Action' }
         Mock New-ScheduledTaskTrigger { return 'Trigger' }
         Mock New-ScheduledTaskPrincipal { return 'Principal' }
-        Mock Register-ScheduledTask -RemoveParameterType Action, Trigger, Principal { return 'ScheduledTask' }
+        Mock Register-TVADCScheduledTask { return 'ScheduledTask' }
     }
 
     It 'declares its task output contract, interval validation, and WhatIf support' {
@@ -37,7 +38,7 @@ Describe 'New-TeamViewerADCScheduledTask' {
         Should -Invoke -CommandName New-ScheduledTaskPrincipal -Times 1 -Exactly -Scope It -ParameterFilter {
             $UserId -eq 'NETWORKSERVICE' -and $LogonType -eq 'ServiceAccount'
         }
-        Should -Invoke -CommandName Register-ScheduledTask -Times 1 -Exactly -Scope It -ParameterFilter {
+        Should -Invoke -CommandName Register-TVADCScheduledTask -Times 1 -Exactly -Scope It -ParameterFilter {
             $TaskPath -eq '\TeamViewerADC\' -and $TaskName -eq 'Automatic Synchronization' -and $Action -eq 'Action' -and $Trigger -eq 'Trigger' -and $Principal -eq 'Principal'
         }
     }
@@ -53,7 +54,7 @@ Describe 'New-TeamViewerADCScheduledTask' {
         Should -Invoke -CommandName New-ScheduledTaskAction -Times 0 -Exactly -Scope It
         Should -Invoke -CommandName New-ScheduledTaskTrigger -Times 0 -Exactly -Scope It
         Should -Invoke -CommandName New-ScheduledTaskPrincipal -Times 0 -Exactly -Scope It
-        Should -Invoke -CommandName Register-ScheduledTask -Times 0 -Exactly -Scope It
+        Should -Invoke -CommandName Register-TVADCScheduledTask -Times 0 -Exactly -Scope It
     }
 
     It 'does not register a scheduled task when invoked with WhatIf' {
@@ -62,6 +63,6 @@ Describe 'New-TeamViewerADCScheduledTask' {
         Should -Invoke -CommandName New-ScheduledTaskAction -Times 0 -Exactly -Scope It
         Should -Invoke -CommandName New-ScheduledTaskTrigger -Times 0 -Exactly -Scope It
         Should -Invoke -CommandName New-ScheduledTaskPrincipal -Times 0 -Exactly -Scope It
-        Should -Invoke -CommandName Register-ScheduledTask -Times 0 -Exactly -Scope It
+        Should -Invoke -CommandName Register-TVADCScheduledTask -Times 0 -Exactly -Scope It
     }
 }

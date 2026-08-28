@@ -141,7 +141,7 @@ Aliases:
 
 Required: False
 Position: 4
-Default value: {}
+Default value: [scriptblock]::Create('')
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

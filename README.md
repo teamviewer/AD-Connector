@@ -36,7 +36,8 @@ Get-Help -Full Invoke-TeamViewerADCSynchronization
 
 The module exports the following commands:
 
-- `Invoke-TeamViewerADCConfiguration` - graphical configuration interface.
+- `Get-TeamViewerADCConfiguration` / `Set-TeamViewerADCConfiguration` - read and change configuration settings.
+- `Convert-TeamViewerADCConfiguration` - convert a legacy configuration file to the current format.
 - `Invoke-TeamViewerADCSynchronization` - run the synchronization.
 - `Invoke-TeamViewerADCLogRotation` - rotate the synchronization log files.
 - `Invoke-TeamViewerADCTeamViewerPSInstallation` / `Test-TeamViewerADCTeamViewerPS` - manage the TeamViewerPS dependency.
@@ -44,21 +45,19 @@ The module exports the following commands:
 
 ## Configuration
 
-The module comes with a graphical configuration interface that can be started with the `Invoke-TeamViewerADCConfiguration` command.
+The module is configured through a JSON configuration file.
+Use `Set-TeamViewerADCConfiguration` to change individual settings, `Get-TeamViewerADCConfiguration` to read the current configuration, and `Convert-TeamViewerADCConfiguration` to migrate a configuration file from the legacy `TeamViewerADConnector` script to the current format.
 
-The configuration provides the following features:
+```powershell
+Set-TeamViewerADCConfiguration -Api_Token '12345678-abcd...' -ActiveDirectory_Groups 'CN=Sales,OU=Groups,DC=example,DC=com'
+```
 
-- Validate the entered TeamViewer API token.
-- Show and adapt the synchronization configuration.
-- Manually trigger a run of the synchronization.
-- Install / uninstall a scheduled task to run the synchronization automatically.
-
-The configuration requires to be run with elevated user rights to be able to install and uninstall the scheduled task.
-Start PowerShell as administrator before running `Invoke-TeamViewerADCConfiguration`.
+Managing the scheduled synchronization task with `New-TeamViewerADCScheduledTask` / `Remove-TeamViewerADCScheduledTask` requires elevated user rights.
+Start PowerShell as administrator before running those commands.
 
 ### Configuration Parameters
 
-- Parameter `ApiToken`:
+- Parameter `Api_Token`:
 
   The TeamViewer API access token that is used for accessing the user / user group data on TeamViewer side.
   For more information on how to create such a token please visit: [TeamViewer for developers](https://www.teamviewer.com/en/global/support/for-developers/)
@@ -70,35 +69,35 @@ Start PowerShell as administrator before running `Invoke-TeamViewerADCConfigurat
   - (optional) _Group management_: _View, create, delete, edit and share groups_
   - (optional) _User group management_: _View, create, delete and edit groups_. Required when user group synchronization is enabled.
 
-- Parameter `ActiveDirectoryGroups`:
+- Parameter `ActiveDirectory_Groups`:
 
   The LDAP identifiers (without the leading `LDAP://` protocol scheme) of the Active Directory user groups used for the synchronization.
 
-- Parameter `UserLanguage`:
+- Parameter `User_Language`:
 
   The two-letter language identifier used as default language for newly created TeamViewer users.
   For example it is used to localize the "User welcome" email.
 
-- Parameter `UseDefaultPassword`:
+- Parameter `Use_DefaultPassword`:
 
-  If set to `true` TeamViewer users will be created with the initial password specified by the `DefaultPassword` parameter.
-  This parameter cannot be used in conjunction with the `UseSsoCustomerId` or `UseGeneratedPassword` parameters.
+  If set to `true` TeamViewer users will be created with the initial password specified by the `User_DefaultPassword` parameter.
+  This parameter cannot be used in conjunction with the `Use_SsoCustomerId` or `Use_GeneratedPassword` parameters.
 
-- Parameter `DefaultPassword`:
+- Parameter `User_DefaultPassword`:
 
   The initial password used for newly created TeamViewer users.
 
-- Parameter `UseSsoCustomerId`:
+- Parameter `Use_SsoCustomerId`:
 
   If set to `true` TeamViewer users will be created having Single Sign-On (SSO) already activated.
-  Therefore a customer ID needs to be specified in the `SsoCustomerId` parameter.
-  This parameter cannot be used in conjunction with the `UseDefaultPassword` or `UseGeneratedPassword` parameters.
+  Therefore a customer ID needs to be specified in the `Sso_CustomerId` parameter.
+  This parameter cannot be used in conjunction with the `Use_DefaultPassword` or `Use_GeneratedPassword` parameters.
 
-- Parameter `SsoCustomerId`:
+- Parameter `Sso_CustomerId`:
 
   The TeamViewer Single Sign-On (SSO) customer identifier.
 
-- Parameter `UseGeneratedPassword`:
+- Parameter `Use_GeneratedPassword`:
 
   If set to `true` TeamViewer users will be created with a generated password.
   The users will receive an email for resetting their password.
@@ -107,23 +106,23 @@ Start PowerShell as administrator before running `Invoke-TeamViewerADCConfigurat
 
   If set to `true` the synchronization will **not** modify any TeamViewer user resources but instead only log the actions that would have been executed.
 
-- Parameter `DeactivateUsers`:
+- Parameter `Sync_DeactivateUsers`:
 
   If set to `true` TeamViewer users that are not member of the selected Active Directory user group will be disabled.
 
-- Parameter `RecursiveGroups`:
+- Parameter `Sync_RecursiveUserGroups`:
 
   If set to `true` users of nested Active Directory user groups will be included.
 
-- Parameter `UseSecondaryEmails`:
+- Parameter `Sync_UseSecondaryEmails`:
 
   If set to `true` the secondary email addresses configured for an Active Directory user will also be taken into account when trying to map to a TeamViewer user.
 
-- Parameter `EnableUserGroupsSync`:
+- Parameter `Sync_IncludeUserGroups`:
 
   If set to `true` the script attempts to synchronize the given Active Directory user groups and their respective users with the TeamViewer user groups.
   Those user groups can then be used to configure TeamViewer functionality, for example: Single Sign-On ownership or exclusions.
-  The user groups synchronization step runs after the user sync. This option requires the API token to have additional permissions, see point `ApiToken` above.
+  The user groups synchronization step runs after the user sync. This option requires the API token to have additional permissions, see point `Api_Token` above.
 
 ### Scheduled Task
 

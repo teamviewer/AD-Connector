@@ -4,17 +4,21 @@
 
 ### Added
 
-- Adds translations for `es`, `fr`, and `it`.
+- Adds `Get-TeamViewerADCConfiguration` and `Set-TeamViewerADCConfiguration` to read and change configuration settings.
+- Adds `Convert-TeamViewerADCConfiguration` to migrate a legacy `TeamViewerADConnector` configuration file to the current format.
 - Adds `AGENTS.md` file for AI coding agents.
 - Imports `TeamViewerPS` PowerShell module for API calls.
-- Adds a setting for the TeamViewer API environment to the configuration.
 
 ### Changed
 
 - Prevents synchronization of Active Directory users without a valid external email address, including `.local` domains.
 - Packages the TeamViewer Active Directory Connector as the `TeamViewerADC` PowerShell module.
 
-## 1.5.0
+### Removed
+
+- Removes the graphical configuration interface and the `Invoke-TeamViewerADCConfiguration` command in favor of the configuration cmdlets.
+
+## 1.5.0 (2023-11-29)
 
 ### Changed
 
@@ -25,37 +29,37 @@
 - Removes company permissions.
 - Removes Conditional Access synchronization support (access groups).
 
-## 1.4.1
+## 1.4.1 (2021-11-30)
 
 ### Fixed
 
 - Fixes missing German translation of the TeamViewer user groups synchronization option.
 
-## 1.4.0
+## 1.4.0 (2021-09-30)
 
 ### Added
 
 - Adds optional synchronization of TeamViewer user groups.
 
-## 1.3.2
+## 1.3.2 (2021-06-25)
 
 ### Fixed
 
 - Fixes bulking of Conditional Access group member requests.
 
-## 1.3.1
+## 1.3.1 (2020-11-03)
 
 ### Fixed
 
 - Fixes TeamViewer API calls to use TLS 1.2.
 
-## 1.3.0
+## 1.3.0 (2020-04-09)
 
 ### Added
 
 - Adds synchronization for TeamViewer Conditional Access directory groups.
 
-## 1.2.2
+## 1.2.2 (2019-01-31)
 
 ### Added
 
