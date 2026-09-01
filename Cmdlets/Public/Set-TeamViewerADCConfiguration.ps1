@@ -12,7 +12,7 @@
         [Parameter(Mandatory = $false)]
         [ValidateScript({ [string]::IsNullOrWhiteSpace($_) -or [uri]::IsWellFormedUriString($_, [System.UriKind]::Absolute) })]
         [string]
-        $Api_Uri ,
+        $Api_Uri,
 
         [Parameter(Mandatory = $false)]
         [string]

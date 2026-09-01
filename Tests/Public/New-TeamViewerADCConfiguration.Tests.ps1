@@ -137,7 +137,7 @@ Describe 'New-TeamViewerADCConfiguration' {
     It 'uses the default configuration file path when not specified' {
         # Get the expected default path from the module directory
         $DefaultPath = Join-Path -Path (Split-Path -Path (Get-Command New-TeamViewerADCConfiguration).ScriptBlock.File) -ChildPath 'Config\TeamViewerADC.json'
-        
+
         # Create a temporary config directory structure to test with
         $ConfigDir = Split-Path -Path $DefaultPath -Parent
         if (-not (Test-Path -Path $ConfigDir -PathType Container)) {

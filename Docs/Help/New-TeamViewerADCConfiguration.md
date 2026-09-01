@@ -421,6 +421,7 @@ Returns the created configuration object if `-PassThru` is specified.
 The configuration is validated before being written to disk. If validation fails, the file is not created and errors are displayed.
 
 Exactly one password method must be selected:
+
 - `-Use_DefaultPassword`
 - `-Use_GeneratedPassword`
 - `-Use_SsoCustomerId`
