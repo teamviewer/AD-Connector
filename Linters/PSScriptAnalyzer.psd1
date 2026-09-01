@@ -1,4 +1,4 @@
 ﻿@{
     Severity     = @('Error', 'Warning')
-    ExcludeRules = @('PSUseToExportFieldsInManifest', 'PSAvoidUsingConvertToSecureStringWithPlainText')
+    ExcludeRules = @('PSUseToExportFieldsInManifest')
 }

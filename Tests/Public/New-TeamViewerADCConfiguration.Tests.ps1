@@ -1,4 +1,12 @@
-﻿BeforeAll {
+﻿<#
+.NOTES
+PSScriptAnalyzer suppression: ConvertTo-SecureString with -AsPlainText is acceptable in test files
+for creating test data with known values.
+#>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingConvertToSecureStringWithPlainText', '')]
+param()
+
+BeforeAll {
     . "$PSScriptRoot\..\..\Cmdlets\Private\Get-TVADCConfigurationDefault.ps1"
     . "$PSScriptRoot\..\..\Cmdlets\Private\Save-TVADCConfiguration.ps1"
     . "$PSScriptRoot\..\..\Cmdlets\Private\Test-TVADCConfiguration.ps1"
