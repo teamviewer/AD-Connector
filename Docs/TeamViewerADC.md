@@ -13,13 +13,17 @@ Targets Windows PowerShell 5.1 and PowerShell 6+ on Windows.
 
 All public commands that help working with the TeamViewer Active Directory Connector.
 
-[`Get-TeamViewerADCConfiguration`](Help/Get-TeamViewerADCConfiguration.md)
-
-[`Set-TeamViewerADCConfiguration`](Help/Set-TeamViewerADCConfiguration.md)
-
 [`Convert-TeamViewerADCConfiguration`](Help/Convert-TeamViewerADCConfiguration.md)
 
+[`Get-TeamViewerADCConfiguration`](Help/Get-TeamViewerADCConfiguration.md)
+
+[`Invoke-TeamViewerADCConfiguration`](Help/Invoke-TeamViewerADCConfiguration.md)
+
 [`Invoke-TeamViewerADCSynchronization`](Help/Invoke-TeamViewerADCSynchronization.md)
+
+[`New-TeamViewerADCConfiguration`](Help/New-TeamViewerADCConfiguration.md)
+
+[`Set-TeamViewerADCConfiguration`](Help/Set-TeamViewerADCConfiguration.md)
 
 [`Invoke-TeamViewerADCLogRotation`](Help/Invoke-TeamViewerADCLogRotation.md)
 
