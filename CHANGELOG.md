@@ -4,9 +4,10 @@
 
 ### Added
 
-- Adds `Get-TeamViewerADCConfiguration` and `Set-TeamViewerADCConfiguration` to read and change configuration settings.
 - Adds `Convert-TeamViewerADCConfiguration` to migrate a legacy `TeamViewerADConnector` configuration file to the current format.
+- Adds `Get-TeamViewerADCConfiguration` and `Set-TeamViewerADCConfiguration` to read and change configuration settings.
 - Adds `Invoke-TeamViewerADCConfiguration` as the graphical configuration interface.
+- Adds `New-TeamViewerADCConfiguration` to create a new configuration file with default values.
 - Adds `AGENTS.md` file for AI coding agents.
 - Imports `TeamViewerPS` PowerShell module for API calls.
 
