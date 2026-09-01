@@ -38,6 +38,7 @@ The module exports the following commands:
 
 - `Get-TeamViewerADCConfiguration` / `Set-TeamViewerADCConfiguration` - read and change configuration settings.
 - `Convert-TeamViewerADCConfiguration` - convert a legacy configuration file to the current format.
+- `Invoke-TeamViewerADCConfiguration` - graphical configuration interface.
 - `Invoke-TeamViewerADCSynchronization` - run the synchronization.
 - `Invoke-TeamViewerADCLogRotation` - rotate the synchronization log files.
 - `Invoke-TeamViewerADCTeamViewerPSInstallation` / `Test-TeamViewerADCTeamViewerPS` - manage the TeamViewerPS dependency.
@@ -47,13 +48,14 @@ The module exports the following commands:
 
 The module is configured through a JSON configuration file.
 Use `Set-TeamViewerADCConfiguration` to change individual settings, `Get-TeamViewerADCConfiguration` to read the current configuration, and `Convert-TeamViewerADCConfiguration` to migrate a configuration file from the legacy `TeamViewerADConnector` script to the current format.
+The graphical configuration interface can be started with `Invoke-TeamViewerADCConfiguration`.
 
 ```powershell
 Set-TeamViewerADCConfiguration -Api_Token '12345678-abcd...' -ActiveDirectory_Groups 'CN=Sales,OU=Groups,DC=example,DC=com'
 ```
 
-Managing the scheduled synchronization task with `New-TeamViewerADCScheduledTask` / `Remove-TeamViewerADCScheduledTask` requires elevated user rights.
-Start PowerShell as administrator before running those commands.
+Managing the scheduled synchronization task with `New-TeamViewerADCScheduledTask` / `Remove-TeamViewerADCScheduledTask` or the graphical configuration interface requires elevated user rights.
+Start PowerShell as administrator before running those commands or `Invoke-TeamViewerADCConfiguration`.
 
 ### Configuration Parameters
 

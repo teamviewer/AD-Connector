@@ -19,6 +19,8 @@ All public commands that help working with the TeamViewer Active Directory Conne
 
 [`Convert-TeamViewerADCConfiguration`](Help/Convert-TeamViewerADCConfiguration.md)
 
+[`Invoke-TeamViewerADCConfiguration`](Help/Invoke-TeamViewerADCConfiguration.md)
+
 [`Invoke-TeamViewerADCSynchronization`](Help/Invoke-TeamViewerADCSynchronization.md)
 
 [`Invoke-TeamViewerADCLogRotation`](Help/Invoke-TeamViewerADCLogRotation.md)
